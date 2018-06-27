@@ -1,0 +1,7 @@
+-Iinclude
+-I../nl_basic/include
+-I../nl_math/include
+-I../nl_compute/include
+-I../nl_learn/include
+-I../nl_fluids_dyn/include
+-I../nl_geometry/include
