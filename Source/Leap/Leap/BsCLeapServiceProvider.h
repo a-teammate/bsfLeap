@@ -20,7 +20,7 @@ namespace bs
 	 * When a LeapHandRepresentation is created, a HandModelBase is removed from the
 	 * pool. When a HandRepresentation is finished, its HandModelBase is returned to
 	 * the pool.
-	  */
+	 */
 	class CLeapServiceProvider : public Component
 	{
 	public:
@@ -40,8 +40,8 @@ namespace bs
 		CLeapServiceProvider(const HSceneObject &parent);
 
 		/**
-		 * The current frame for this update cycle, in world space. 
-		 * 
+		 * The current frame for this update cycle, in world space.
+		 *
 		 * IMPORTANT!  This frame might be mutable!  If you hold onto a reference
 		 * to this frame, or a reference to any object that is a part of this frame,
 		 * it might change unexpectedly.  If you want to save a reference, make sure
@@ -51,7 +51,7 @@ namespace bs
 
 		/**
 		 * The current frame for this fixed update cycle, in world space.
-		 * 
+		 *
 		 * IMPORTANT!  This frame might be mutable!  If you hold onto a reference
 		 * to this frame, or a reference to any object that is a part of this frame,
 		 * it might change unexpectedly.  If you want to save a reference, make sure
@@ -73,10 +73,10 @@ namespace bs
 		void retransformFrames();
 
 	public:
-		typedef void(*PfnOnDevice)(const LeapDevice* device);
+		typedef void(*PfnOnDevice)(SPtr<LeapDevice> device);
 
 		/** Event to get a callback whenever a new device is connected to the service. */
-		Event<void(LeapDevice* device)> onDeviceSafe;
+		Event<void(SPtr<LeapDevice> device)> onDeviceSafe;
 
 		Event<void(const LeapFrame*)> onUpdateFrame;
 		Event<void(const LeapFrame*)> onFixedFrame;
@@ -85,7 +85,7 @@ namespace bs
 		* Event to get a callback whenever a new device is connected to the service.
 		* This callback will ALSO trigger a callback upon subscription if a device is connected.
 		*/
-		HEvent onDeviceSafeConnect(std::function<void(const LeapDevice*)> func);
+		HEvent onDeviceSafeConnect(std::function<void(SPtr<LeapDevice>)> func);
 
 	protected:
 		/**

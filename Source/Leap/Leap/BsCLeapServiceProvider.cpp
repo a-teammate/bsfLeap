@@ -33,22 +33,18 @@ namespace bs
 
 	LeapFrame* CLeapServiceProvider::getCurrentFrame()
 	{
-		if (mFrameOptimization == FrameOptimizationReusePhysicsForUpdate) {
+		if (mFrameOptimization == FrameOptimizationReusePhysicsForUpdate)
 			return mTransformedFixedFrame.get();
-		}
-		else {
+		else
 			return mTransformedUpdateFrame.get();
-		}
 	}
 
 	LeapFrame* CLeapServiceProvider::getCurrentFixedFrame()
 	{
-		if (mFrameOptimization == FrameOptimizationReuseUpdateForPhysics) {
+		if (mFrameOptimization == FrameOptimizationReuseUpdateForPhysics)
 			return mTransformedUpdateFrame.get();
-		}
-		else {
+		else
 			return mTransformedFixedFrame.get();
-		}
 	}
 
 	bool CLeapServiceProvider::isConnected()
@@ -77,12 +73,12 @@ namespace bs
 		transformFrame(mUntransformedFixedFrame.get(), mTransformedFixedFrame.get());
 	}
 
-	HEvent CLeapServiceProvider::onDeviceSafeConnect(std::function<void(const LeapDevice*)> func)
+	HEvent CLeapServiceProvider::onDeviceSafeConnect(std::function<void(SPtr<LeapDevice>)> func)
 	{
-		if (mLeap->isConnected()) {
-			for (auto& it : mLeap->getDevices()) {
+		if (mLeap->isConnected())
+		{
+			for (auto& it : mLeap->getDevices())
 				func(it.second);
-			}
 		}
 
 		return onDeviceSafe.connect(func);
@@ -90,9 +86,8 @@ namespace bs
 
 	void CLeapServiceProvider::initializeService()
 	{
-		if (mLeap != NULL) {
+		if (mLeap != NULL)
 			return;
-		}
 
 		mLeap = &gLeapService();
 
@@ -100,10 +95,12 @@ namespace bs
 		mOnDeviceInitConn = mLeap->onDevice.connect(
 			std::bind(&CLeapServiceProvider::triggerOnDeviceSafe, this, _1));
 
-		if (mLeap->isConnected()) {
+		if (mLeap->isConnected())
+		{
 			initializeFlags();
 		}
-		else {
+		else
+		{
 			mOnDeviceInitConn = mLeap->onDevice.connect(
 				std::bind(&CLeapServiceProvider::onDeviceInit, this, _1));
 		}
@@ -111,22 +108,19 @@ namespace bs
 
 	void CLeapServiceProvider::initializeFlags()
 	{
-		if (mLeap == NULL) {
+		if (mLeap == NULL)
 			return;
-		}
 
 		mLeap->clearPolicy((eLeapPolicyFlag)0);
 	}
 
 	void CLeapServiceProvider::releaseService()
 	{
-		if (mLeap == NULL) {
+		if (mLeap == NULL)
 			return;
-		}
 
-		if (mLeap->isConnected()) {
+		if (mLeap->isConnected())
 			mLeap->clearPolicy(eLeapPolicyFlag_OptimizeHMD);
-		}
 
 		mLeap->stopConnection();
 		mLeap = NULL;
@@ -134,15 +128,18 @@ namespace bs
 
 	bool CLeapServiceProvider::checkConnectionIntegrity()
 	{
-		if (mLeap->isServiceConnected()) {
+		if (mLeap->isServiceConnected())
+		{
 			mFramesSinceServiceConnectionChecked = 0;
 			mNumberOfReconnectionAttempts = 0;
 			return true;
 		}
-		else if (mNumberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+		else if (mNumberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS)
+		{
 			mFramesSinceServiceConnectionChecked++;
 
-			if (mFramesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
+			if (mFramesSinceServiceConnectionChecked > RECONNECTION_INTERVAL)
+			{
 				mFramesSinceServiceConnectionChecked = 0;
 				mNumberOfReconnectionAttempts++;
 
@@ -158,26 +155,22 @@ namespace bs
 
 	void CLeapServiceProvider::handleUpdateFrameEvent(LeapFrame* frame)
 	{
-		if (!onUpdateFrame.empty()) {
+		if (!onUpdateFrame.empty())
 			onUpdateFrame(frame);
-		}
 	}
 
 	void CLeapServiceProvider::handleFixedFrameEvent(LeapFrame* frame)
 	{
-		if (!onFixedFrame.empty()) {
+		if (!onFixedFrame.empty())
 			onFixedFrame(frame);
-		}
 	}
 
 	int64_t CLeapServiceProvider::calculateInterpolationTime()
 	{
-		if (mLeap != NULL) {
+		if (mLeap != NULL)
 			return mLeap->getNow() - (uint64_t)mSmoothedTrackingLatency.mValue;
-		}
-		else {
+		else
 			return 0;
-		}
 	}
 
 	void CLeapServiceProvider::transformFrame(const LeapFrame* source, LeapFrame* dest)
@@ -195,25 +188,29 @@ namespace bs
 
 	void CLeapServiceProvider::triggerOnDeviceSafe(const LEAP_DEVICE_EVENT *device_event)
 	{
-		if (!onDeviceSafe.empty()) {
-			LeapDevice *device = mLeap->getDeviceByHandle(device_event->device.handle);
+		if (!onDeviceSafe.empty())
+		{
+			SPtr<LeapDevice> device = mLeap->getDeviceByHandle(device_event->device.handle);
 			onDeviceSafe(device);
 		}
 	}
 
 	void CLeapServiceProvider::update()
 	{
-		if (!mLeap->isConnected() || !mLeap->hasFrame()) {
+		if (!mLeap->isConnected() || !mLeap->hasFrame())
+		{
 			checkConnectionIntegrity();
 			return;
 		}
 
-		if (mFrameOptimization == FrameOptimizationReusePhysicsForUpdate) {
+		if (mFrameOptimization == FrameOptimizationReusePhysicsForUpdate)
+		{
 			handleUpdateFrameEvent(mTransformedFixedFrame.get());
 			return;
 		}
 
-		if (mUseInterpolation) {
+		if (mUseInterpolation)
+		{
 			float trackingLatency = (float)(mLeap->getNow() - mLeap->getFrameTimestamp());
 			mSmoothedTrackingLatency.mValue = std::min(mSmoothedTrackingLatency.mValue, 30000.0f);
 			mSmoothedTrackingLatency.update(trackingLatency, gTime().getFrameDelta());
@@ -222,19 +219,19 @@ namespace bs
 			int64_t timestamp = interpolationTime + (mExtrapolationAmount * 1000);
 			int64_t sourceTimestamp = interpolationTime - (mBounceAmount * 1000);
 
-			bool success = mLeap->getInterpolatedFrameFromTime(timestamp, sourceTimestamp,
-				&mUntransformedUpdateFrame);
-			if (!success) {
+			bool success = mLeap->getInterpolatedFrameFromTime(timestamp, sourceTimestamp, &mUntransformedUpdateFrame);
+			if (!success)
 				return;
-			}
 
 			mBsToLeapOffset = timestamp - (uint64_t)(gTime().getTime() * S_TO_NS);
 		}
-		else {
+		else
+		{
 			*mUntransformedUpdateFrame.get() = mLeap->getFrame();
 		}
 
-		if (mUntransformedUpdateFrame.get() != NULL) {
+		if (mUntransformedUpdateFrame.get() != NULL)
+		{
 			transformFrame(mUntransformedUpdateFrame.get(), mTransformedUpdateFrame.get());
 
 			//handleUpdateFrameEvent(mTransformedUpdateFrame.get());
@@ -244,27 +241,30 @@ namespace bs
 
 	void CLeapServiceProvider::fixedUpdate()
 	{
-		if (!mLeap->isConnected() || !mLeap->hasFrame()) {
+		if (!mLeap->isConnected() || !mLeap->hasFrame())
 			return;
-		}
 
-		if (mFrameOptimization == FrameOptimizationReuseUpdateForPhysics) {
+		if (mFrameOptimization == FrameOptimizationReuseUpdateForPhysics)
+		{
 			handleFixedFrameEvent(mTransformedUpdateFrame.get());
 			return;
 		}
 
-		if (mUseInterpolation) {
-
+		if (mUseInterpolation)
+		{
 			uint64_t timestamp;
-			switch (mFrameOptimization) {
-			case FrameOptimizationNone: {
+			switch (mFrameOptimization)
+			{
+			case FrameOptimizationNone:
+			{
 				// By default we use gCoreApplication().getFixedUpdateStep() to ensure that our hands are on the same
 				// timeline as Update.  We add an extrapolation value to help compensate
 				// for latency.
 				float extrapolatedTime = gCoreApplication().getLastFixedUpdateTime() + calculatePhysicsExtrapolation();
 				timestamp = (uint64_t)(extrapolatedTime * S_TO_NS) + mBsToLeapOffset;
 			} break;
-			case FrameOptimizationReusePhysicsForUpdate: {
+			case FrameOptimizationReusePhysicsForUpdate:
+			{
 				// If we are re-using physics frames for update, we don't even want to care
 				// about gCoreApplication().getFixedUpdateStep(), just grab the most recent interpolated timestamp
 				// like we are in Update.
@@ -274,15 +274,16 @@ namespace bs
 				LOGERR("Unexpected frame optimization mode: " + mFrameOptimization);
 			}
 			bool success = mLeap->getInterpolatedFrame(timestamp, &mUntransformedFixedFrame);
-			if (!success) {
+			if (!success)
 				return;
-			}
 		}
-		else {
+		else
+		{
 			*mUntransformedFixedFrame.get() = mLeap->getFrame();
 		}
 
-		if (mUntransformedFixedFrame.get() != NULL) {
+		if (mUntransformedFixedFrame.get() != NULL)
+		{
 			transformFrame(mUntransformedFixedFrame.get(), mTransformedFixedFrame.get());
 
 			handleFixedFrameEvent(mTransformedFixedFrame.get());

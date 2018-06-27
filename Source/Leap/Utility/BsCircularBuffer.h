@@ -40,7 +40,8 @@ namespace bs
 
 	public:
 		/** Construct CircularBuffer. */
-		CircularBuffer(size_type capacity) {
+		CircularBuffer(size_type capacity)
+		{
 			mCapacity = capacity;
 			mSize = 0;
 			mCurrent = 0;
@@ -58,12 +59,13 @@ namespace bs
 		size_type size() const { return mSize; }
 
 		/** Adds a new element. Once full, this will overwrite the oldest item. */
-		void push(const_reference val) {
-			if (!empty()) {
+		void push(const_reference val)
+		{
+			if (!empty())
+			{
 				mCurrent++;
-				if (mCurrent >= mCapacity) {
+				if (mCurrent >= mCapacity)
 					mCurrent = 0;
-				}
 			}
 			if (mSize < mCapacity)
 				mSize++;
@@ -72,59 +74,64 @@ namespace bs
 		}
 
 		/** Access element. */
-		const_reference at(size_type n) const {
+		const_reference at(size_type n) const
+		{
 			assert(n < mSize);
 
 			size_type effectiveIndex = mCurrent - n;
-			if (effectiveIndex < 0) {
+			if (effectiveIndex < 0)
 				effectiveIndex += mCapacity;
-			}
 
 			return mArray[effectiveIndex];
 		}
 
 		/** Access element. */
-		reference at(size_type n) {
+		reference at(size_type n)
+		{
 			assert(n < mSize);
 
 			size_type effectiveIndex = mCurrent - n;
-			if (effectiveIndex < 0) {
+			if (effectiveIndex < 0)
 				effectiveIndex += mCapacity;
-			}
 
 			return mArray[effectiveIndex];
 		}
 
 		/** Access element. */
-		const_reference top(size_type n) const {
+		const_reference top(size_type n) const
+		{
 			return at(0);
 		}
 
 		/** Access element. */
-		reference top(size_type n) {
+		reference top(size_type n)
+		{
 			return at(0);
 		}
 
 		/** Access element. */
-		const_reference operator[](size_type n) const {
+		const_reference operator[](size_type n) const
+		{
 			return at(n);
 		}
 
 		/** Access element. */
-		reference operator[](size_type n) {
+		reference operator[](size_type n)
+		{
 			return at(n);
 		}
 
 		/** Change size. */
-		void resize(size_type n) {
-			if (n <= mCapacity) {
+		void resize(size_type n)
+		{
+			if (n <= mCapacity)
 				return;
-			}
 
 			Vector<value_type, A> arrayNew(n);
 
 			size_type j = 0;
-			for (size_type i = mSize - 1; i >= 0; i--) {
+			for (size_type i = mSize - 1; i >= 0; i--)
+			{
 				const_reference r = at(i);
 				arrayNew[j++] = r;
 			}

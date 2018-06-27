@@ -1,9 +1,9 @@
 //************************************ bs::framework - Copyright 2018 Next Limit *****************************************//
-//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is 
+//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "Reflection/BsRTTIType.h"
 #include "Leap/BsCLeapHandModelBase.h"
+#include "Private/RTTI/BsGameObjectRTTI.h"
 
 namespace bs
 {

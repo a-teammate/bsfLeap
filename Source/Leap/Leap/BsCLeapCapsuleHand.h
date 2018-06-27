@@ -5,7 +5,6 @@
 #include "Leap/BsCLeapHandModel.h"
 #include "Material/BsMaterial.h"
 #include "Mesh/BsMesh.h"
-
 #include "Scene/BsSceneObject.h"
 
 namespace bs
@@ -24,28 +23,16 @@ namespace bs
 		CLeapCapsuleHand(const HSceneObject &parent);
 
 		/** @copydoc CLeapHandModelBase::getChirality */
-		eLeapHandType getChirality() const override
-		{
-			return mChirality;
-		}
+		eLeapHandType getChirality() const override { return mChirality; }
 
 		/** @copydoc CLeapHandModelBase::getType */
-		LeapModelType getType() const override
-		{
-			return LeapModelType::Graphics;
-		}
+		LeapModelType getType() const override { return LeapModelType::Graphics; }
 
 		/** @copydoc CLeapHandModelBase::getLeapHand */
-		LeapHand* getLeapHand() const override
-		{
-			return mHand;
-		}
+		LeapHand* getLeapHand() const override { return mHand; }
 
 		/** @copydoc CLeapHandModelBase::setLeapHand */
-		void setLeapHand(LeapHand* hand) override
-		{
-			mHand = hand;
-		}
+		void setLeapHand(LeapHand* hand) override { mHand = hand; }
 
 		/** @copydoc CLeapHandModelBase::init */
 		void init() override
@@ -60,11 +47,13 @@ namespace bs
 		{
 			CLeapHandModelBase::begin();
 
-			//if (mHand->mIsLeft) {
+			//if (mHand->mIsLeft)
+			//{
 			//	//mSphereMaterial->color = _leftColorList[_leftColorIndex];
 			//	//_leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
 			//}
-			//else {
+			//else
+			//{
 			//	//mSphereMaterial->color = _rightColorList[_rightColorIndex];
 			//	//_rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
 			//}
@@ -73,13 +62,11 @@ namespace bs
 		/** @copydoc CLeapHandModelBase::update */
 		void update() override
 		{
-			if (mSpherePositions.size() != TOTAL_JOINT_COUNT) {
+			if (mSpherePositions.size() != TOTAL_JOINT_COUNT)
 				mSpherePositions.resize(TOTAL_JOINT_COUNT);
-			}
 
-			if (mSphereMaterial == NULL) {
-				//mSphereMaterial = new Material(mMaterial);
-			}
+			//if (mSphereMaterial == NULL)
+			//	mSphereMaterial = new Material(mMaterial);
 
 			if (!mHand)
 				return;
@@ -103,7 +90,8 @@ namespace bs
 			}
 
 			////Update all joint spheres in the fingers
-			//foreach(var finger in mHand->Fingers) {
+			//foreach(var finger in mHand->Fingers)
+			//{
 			//	for (int j = 0; j < 4; j++) {
 			//		int key = getFingerJointIndex((int)finger.Type, j);
 			//
@@ -125,7 +113,8 @@ namespace bs
 			//drawSphere(mockThumbJointPos);
 			//
 			////If we want to show the arm, do the calculations and display the meshes
-			//if (_showArm) {
+			//if (_showArm)
+			//{
 			//	var arm = mHand->Arm;
 			//
 			//	Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
@@ -152,8 +141,10 @@ namespace bs
 			//}
 			//
 			////Draw cylinders between finger joints
-			//for (int i = 0; i < 5; i++) {
-			//	for (int j = 0; j < 3; j++) {
+			//for (int i = 0; i < 5; i++)
+			//{
+			//	for (int j = 0; j < 3; j++)
+			//	{
 			//		int keyA = getFingerJointIndex(i, j);
 			//		int keyB = getFingerJointIndex(i, j + 1);
 			//
@@ -165,7 +156,8 @@ namespace bs
 			//}
 			//
 			////Draw cylinders between finger knuckles
-			//for (int i = 0; i < 4; i++) {
+			//for (int i = 0; i < 4; i++)
+			//{
 			//	int keyA = getFingerJointIndex(i, 0);
 			//	int keyB = getFingerJointIndex(i + 1, 0);
 			//
@@ -194,25 +186,17 @@ namespace bs
 		void drawSphere(Vector3 position, float radius)
 		{
 			//multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
-			//Graphics.DrawMesh(_sphereMesh,
-			//	Matrix4x4.TRS(position,
-			//		Quaternion.identity,
-			//		Vector3.one * radius * 2.0f * transform.lossyScale.x),
-			//	mSphereMaterial, 0,
-			//	NULL, 0, NULL, mCastShadows);
+			//Graphics.DrawMesh(_sphereMesh, Matrix4x4.TRS(position, Quaternion.identity,
+			//	Vector3.one * radius * 2.0f * transform.lossyScale.x), mSphereMaterial, 0, NULL, 0, NULL, mCastShadows);
 		}
 
 		void drawCylinder(Vector3 a, Vector3 b)
 		{
 			//float length = (a - b).length();
 			//
-			//Graphics.DrawMesh(getCylinderMesh(length),
-			//	Matrix4x4.TRS(a,
-			//		Quaternion.LookRotation(b - a),
-			//		new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
-			//	mMaterial,
-			//	gameObject.layer,
-			//	NULL, 0, NULL, mCastShadows);
+			//Graphics.DrawMesh(getCylinderMesh(length), Matrix4x4.TRS(a, Quaternion.LookRotation(b - a),
+			//	Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)), mMaterial, gameObject.layer, NULL, 0, NULL,
+			//	mCastShadows);
 		}
 
 		void drawCylinder(int a, int b)
@@ -236,9 +220,8 @@ namespace bs
 		//	int lengthKey = Math::roundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
 		//
 		//	Mesh mesh;
-		//	if (_meshMap.TryGetValue(lengthKey, out mesh)) {
+		//	if (_meshMap.TryGetValue(lengthKey, out mesh))
 		//		return mesh;
-		//	}
 		//
 		//	mesh = new Mesh;
 		//	mesh.name = "GeneratedCylinder";
@@ -249,7 +232,8 @@ namespace bs
 		//
 		//	Vector3 p0 = Vector3::ZERO;
 		//	Vector3 p1 = -Vector3::UNIT_Z * length;
-		//	for (int i = 0; i < _cylinderResolution; i++) {
+		//	for (int i = 0; i < _cylinderResolution; i++)
+		//	{
 		//		float angle = (Mathf.PI * 2.0f * i) / _cylinderResolution;
 		//		float dx = _cylinderRadius * Mathf.Cos(angle);
 		//		float dy = _cylinderRadius * Mathf.Sin(angle);
@@ -298,7 +282,6 @@ namespace bs
 		static const int _rightColorIndex = 0;
 		//static const Color _leftColorList[] = { Color(0.0f, 0.0f, 1.0f), Color(0.2f, 0.0f, 0.4f), Color(0.0f, 0.2f, 0.2f) };
 		//static const Color _rightColorList[] = { Color(1.0f, 0.0f, 0.0f), Color(1.0f, 1.0f, 0.0f), Color(1.0f, 0.5f, 0.0f) };
-
 
 		bool _showArm = true;
 

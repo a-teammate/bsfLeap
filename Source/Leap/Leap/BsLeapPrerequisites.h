@@ -47,6 +47,8 @@
 
 namespace bs
 {
+	typedef void* LeapDeviceHandle;
+
 	class CLeapCapsuleHand;
 	class CLeapHandEnableDisable;
 	class CLeapHandModel;

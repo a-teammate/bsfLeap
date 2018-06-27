@@ -2,10 +2,7 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "LeapC.h"
-
 #include "Leap/BsLeapPrerequisites.h"
-#include "Utility/BsModule.h"
 
 namespace bs
 {
@@ -33,7 +30,8 @@ namespace bs
 
 		float update(float input, float deltaTime = 1.0f)
 		{
-			if (deltaTime > 0.0f && !mReset) {
+			if (deltaTime > 0.0f && !mReset)
+			{
 				float alpha = mDelay / deltaTime;
 				float blend = alpha / (1.0f + alpha);
 				// NOTE: If mDelay -> 0 then blend -> 0,
@@ -42,7 +40,8 @@ namespace bs
 				// so the change in the filtered value will be suppressed
 				mValue = Math::lerp(1.0f - blend, mValue, input);
 			}
-			else {
+			else
+			{
 				mValue = input;
 				mReset = false;
 			}

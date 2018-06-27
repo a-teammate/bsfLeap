@@ -13,7 +13,8 @@ namespace bs
 {
 	static String toString(eLeapRS r)
 	{
-		switch (r) {
+		switch (r)
+		{
 		case eLeapRS_Success:
 			return "eLeapRS_Success";
 		case eLeapRS_UnknownError:
@@ -77,32 +78,36 @@ namespace bs
 			return;
 
 		eLeapRS result;
-		if (mConnection == NULL) {
+		if (mConnection == NULL)
+		{
 			result = LeapCreateConnection(NULL, &mConnection);
-			if (result != eLeapRS_Success || mConnection == NULL) {
+			if (result != eLeapRS_Success || mConnection == NULL)
+			{
 				LOGERR("LeapCreateConnection call was " + toString(result));
 				return;
 			}
 		}
 		result = LeapOpenConnection(mConnection);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
+		{
 			LOGERR("LeapOpenConnection call was " + toString(result));
 			return;
 		}
 
-		if (mAllocator.allocate == NULL) {
+		if (mAllocator.allocate == NULL)
 			mAllocator.allocate = bs_leap_alloc;
-		}
-		if (mAllocator.deallocate == NULL) {
+
+		if (mAllocator.deallocate == NULL)
 			mAllocator.deallocate = bs_leap_free;
-		}
+
 		LeapSetAllocator(mConnection, &mAllocator);
 
 		mIsRunning = true;
 		mThread = bs_new<Thread>(std::bind(&LeapService::processMessageLoop, this));
 	}
 
-	void LeapService::stopConnection() {
+	void LeapService::stopConnection()
+	{
 		if (!mIsRunning)
 			return;
 
@@ -127,19 +132,18 @@ namespace bs
 		LeapDestroyConnection(mConnection);
 	}
 
-	LeapDevice* LeapService::getDeviceActive()
+	SPtr<LeapDevice> LeapService::getDeviceActive() const
 	{
 		auto itFind = std::find_if(mDevices.begin(), mDevices.end(), [&](auto& x) { return x.second->isStreaming(); });
-		if (itFind != mDevices.end()) {
+		if (itFind != mDevices.end())
 			return itFind->second;
-		}
 
 		return NULL;
 	}
 
-	LeapDevice* LeapService::getDeviceByHandle(void* handle)
+	SPtr<LeapDevice> LeapService::getDeviceByHandle(LeapDeviceHandle handle)
 	{
-		return mDevices.at(handle);
+		return findDeviceByHandle(handle);
 	}
 
 	int64_t LeapService::getNow()
@@ -154,27 +158,28 @@ namespace bs
 		return history < mFrames.size();
 	}
 
-	LeapFrame &LeapService::getFrame(uint32_t history)
+	const LeapFrame& LeapService::getFrame(uint32_t history)
 	{
 		Lock lock(mMutex);
 
-		LeapFrame& trackingEvent = mFrames[history];
-		return trackingEvent;
+		LeapFrame& frame = mFrames[history];
+		return frame;
 	}
 
 	int64_t LeapService::getFrameTimestamp(uint32_t history)
 	{
 		Lock lock(mMutex);
 
-		LeapFrame& trackingEvent = mFrames[history];
-		return trackingEvent.mInfo.timestamp;
+		LeapFrame& frame = mFrames[history];
+		return frame.mInfo.timestamp;
 	}
 
 	bool LeapService::getInterpolatedFrameSize(int64_t timestamp, uint64_t& size)
 	{
 		eLeapRS result = LeapGetFrameSize(mConnection, timestamp, &size);
 
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
+		{
 			LOGERR("LeapGetFrameSize call was " + toString(result));
 			return false;
 		}
@@ -186,15 +191,15 @@ namespace bs
 	{
 		uint64_t size;
 		bool success = getInterpolatedFrameSize(time, size);
-		if (!success) {
+		if (!success)
 			return false;
-		}
 
 		toFill->resize(size);
 
 		LEAP_TRACKING_EVENT* trackingEvent = reinterpret_cast<LEAP_TRACKING_EVENT*>(toFill->get());
 		eLeapRS result = LeapInterpolateFrame(mConnection, time, trackingEvent, size);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
+		{
 			LOGERR("LeapInterpolateFrame call was " + toString(result));
 			return false;
 		}
@@ -206,15 +211,15 @@ namespace bs
 	{
 		uint64_t size;
 		bool success = getInterpolatedFrameSize(time, size);
-		if (!success) {
+		if (!success)
 			return false;
-		}
 
 		toFill->resize(size);
 
 		LEAP_TRACKING_EVENT* trackingEvent = reinterpret_cast<LEAP_TRACKING_EVENT*>(toFill->get());
 		eLeapRS result = LeapInterpolateFrameFromTime(mConnection, time, sourceTime, trackingEvent, size);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
+		{
 			LOGERR("LeapInterpolateFrameFromTime call was " + toString(result));
 			return false;
 		}
@@ -230,9 +235,8 @@ namespace bs
 		uint64_t clearFlags = ~mRequestedPolicies; // inverse of desired policies
 
 		eLeapRS result = LeapSetPolicyFlags(mConnection, setFlags, clearFlags);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
 			LOGERR("LeapSetPolicyFlags call was " + toString(result));
-		}
 	}
 
 	void LeapService::clearPolicy(eLeapPolicyFlag policy)
@@ -241,9 +245,8 @@ namespace bs
 		mRequestedPolicies = mRequestedPolicies & ~clearFlags;
 
 		eLeapRS result = LeapSetPolicyFlags(mConnection, mRequestedPolicies, ~mRequestedPolicies);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
 			LOGERR("LeapSetPolicyFlagss call was " + toString(result));
-		}
 	}
 
 	bool LeapService::isConnected() const
@@ -259,9 +262,8 @@ namespace bs
 		LEAP_CONNECTION_INFO info;
 
 		eLeapRS result = LeapGetConnectionInfo(mConnection, &info);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
 			LOGERR("LeapGetConnectionInfo call was " + toString(result));
-		}
 
 		if (info.status == eLeapConnectionStatus_Connected)
 			return true;
@@ -269,23 +271,12 @@ namespace bs
 		return false;
 	}
 
-	LeapDevice* LeapService::createDevice()
+	SPtr<LeapDevice> LeapService::findDeviceByHandle(LeapDeviceHandle handle)
 	{
-		LeapDevice* device = new LeapDevice;
-		return device;
-	}
+		auto itFind = mDevices.find(handle);
+		if (itFind != mDevices.end())
+			return itFind->second;
 
-	void LeapService::destroyDevice(LeapDevice* device)
-	{
-		delete device;
-	}
-
-	LeapDevice* LeapService::findDeviceByHandle(void* handle)
-	{
-		auto it = std::find_if(mDevices.begin(), mDevices.end(), [&](auto& x) { return x.second->getHandle() == handle; });
-		if (it != mDevices.end()) {
-			return it->second;
-		}
 		return NULL;
 	}
 
@@ -299,16 +290,19 @@ namespace bs
 	{
 		eLeapRS result;
 		LEAP_CONNECTION_MESSAGE msg;
-		while (mIsRunning) {
+		while (mIsRunning)
+		{
 			unsigned int timeout = 1000;
 			result = LeapPollConnection(mConnection, timeout, &msg);
 
-			if (result != eLeapRS_Success) {
+			if (result != eLeapRS_Success)
+			{
 				LOGWRN("LeapPollConnection call was " + toString(result));
 				continue;
 			}
 
-			switch (msg.type) {
+			switch (msg.type)
+			{
 			case eLeapEventType_Connection:
 				handleOnConnection(msg.connection_event);
 				break;
@@ -360,32 +354,31 @@ namespace bs
 			default:
 				// discard unknown message types
 				printf("Unhandled message type %i.\n", msg.type);
-			} // switch on msg.type
+			}
 		}
 	}
 
-	void LeapService::handleOnConnection(const LEAP_CONNECTION_EVENT* connection_event)
+	void LeapService::handleOnConnection(const LEAP_CONNECTION_EVENT* connectionEvent)
 	{
 		mIsConnected = true;
-		if (!onConnection.empty()) {
-			onConnection(connection_event);
-		}
+		if (!onConnection.empty())
+			onConnection(connectionEvent);
 	}
 
-	void LeapService::handleOnConnectionLost(const LEAP_CONNECTION_LOST_EVENT *connection_lost_event)
+	void LeapService::handleOnConnectionLost(const LEAP_CONNECTION_LOST_EVENT* connectionLostEvent)
 	{
 		mIsConnected = false;
-		if (!onConnectionLost.empty()) {
-			onConnectionLost(connection_lost_event);
-		}
+		if (!onConnectionLost.empty())
+			onConnectionLost(connectionLostEvent);
 	}
 
-	void LeapService::handleOnDevice(const LEAP_DEVICE_EVENT *device_event)
+	void LeapService::handleOnDevice(const LEAP_DEVICE_EVENT* deviceEvent)
 	{
 		// Open device using LEAP_DEVICE_REF from event struct.
 		LEAP_DEVICE deviceHandle;
-		eLeapRS result = LeapOpenDevice(device_event->device, &deviceHandle);
-		if (result != eLeapRS_Success) {
+		eLeapRS result = LeapOpenDevice(deviceEvent->device, &deviceHandle);
+		if (result != eLeapRS_Success)
+		{
 			printf("Could not open device %s.\n", toString(result));
 			return;
 		}
@@ -397,56 +390,47 @@ namespace bs
 		result = LeapGetDeviceInfo(deviceHandle, &deviceInfo);
 		deviceInfo.serial = (char *)malloc(deviceInfo.serial_length);
 		result = LeapGetDeviceInfo(deviceHandle, &deviceInfo);
-		if (result != eLeapRS_Success) {
+		if (result != eLeapRS_Success)
+		{
 			printf("Failed to get device info %s.\n", toString(result));
 			free(deviceInfo.serial);
 			return;
 		}
 
-		LeapDevice* device = findDeviceByHandle(deviceHandle);
+		SPtr<LeapDevice> device = findDeviceByHandle(deviceHandle);
 
-		if (device == NULL) {
-			device = createDevice();
+		if (device == NULL)
+		{
+			device = bs_shared_ptr_new<LeapDevice>();
 			mDevices[deviceHandle] = device;
 		}
 
-		device->set(deviceHandle,
-			deviceInfo.h_fov, //radians
-			deviceInfo.v_fov, //radians
-			deviceInfo.range / 1000.0f, //to mm
-			deviceInfo.baseline / 1000.0f, //to mm
-			deviceInfo.pid,
-			(deviceInfo.status == eLeapDeviceStatus_Streaming),
+		device->set(deviceHandle, deviceInfo.h_fov, deviceInfo.v_fov, deviceInfo.range / 1000.0f,
+			deviceInfo.baseline / 1000.0f, deviceInfo.pid, (deviceInfo.status == eLeapDeviceStatus_Streaming),
 			deviceInfo.serial);
 
-		if (!onDevice.empty()) {
-			onDevice(device_event);
-		}
+		if (!onDevice.empty())
+			onDevice(deviceEvent);
 
 		free(deviceInfo.serial);
 
 		LeapCloseDevice(deviceHandle);
 	}
 
-	void LeapService::handleOnDeviceLost(const LEAP_DEVICE_EVENT *device_event)
+	void LeapService::handleOnDeviceLost(const LEAP_DEVICE_EVENT* deviceEvent)
 	{
-		LeapDevice* device = findDeviceByHandle(device_event->device.handle);
+		auto itFind = mDevices.find(deviceEvent->device.handle);
+		mDevices.erase(itFind);
 
-		auto it = mDevices.find(device);
-		mDevices.erase(it);
-
-		destroyDevice(device);
-
-		if (!onDeviceLost.empty()) {
-			onDeviceLost(device_event);
-		}
+		if (!onDeviceLost.empty())
+			onDeviceLost(deviceEvent);
 	}
 
-	void LeapService::handleOnDeviceFailure(const LEAP_DEVICE_FAILURE_EVENT *device_failure_event)
+	void LeapService::handleOnDeviceFailure(const LEAP_DEVICE_FAILURE_EVENT* deviceFailureEvent)
 	{
 		String failureMessage;
 		String failedSerialNumber = "Unavailable";
-		switch (device_failure_event->status)
+		switch (deviceFailureEvent->status)
 		{
 		case eLeapDeviceStatus_BadCalibration:
 			failureMessage = "Bad Calibration. Device failed because of a bad calibration record.";
@@ -465,87 +449,75 @@ namespace bs
 			break;
 		}
 
-		LeapDevice* device = findDeviceByHandle(device_failure_event->hDevice);
-		if (device != NULL) {
-			auto it = mDevices.find(device);
-			mDevices.erase(it);
+		auto itFind = mDevices.find(deviceFailureEvent->hDevice);
+		if (itFind != mDevices.end())
+			mDevices.erase(itFind);
 
-			destroyDevice(device);
-		}
-
-		if (!onDeviceFailure.empty()) {
-			onDeviceFailure(device_failure_event);
-		}
+		if (!onDeviceFailure.empty())
+			onDeviceFailure(deviceFailureEvent);
 	}
 
-	void LeapService::handleOnTracking(const LEAP_TRACKING_EVENT *tracking_event)
+	void LeapService::handleOnTracking(const LEAP_TRACKING_EVENT* trackingEvent)
 	{
-		const LeapFrame* frame = reinterpret_cast<const LeapFrame*>(tracking_event);
+		const LeapFrame* frame = reinterpret_cast<const LeapFrame*>(trackingEvent);
 		pushFrame(frame);
 
-		if (!onFrame.empty()) {
+		if (!onFrame.empty())
 			onFrame(frame);
-		}
 	}
 
-	void LeapService::handleOnLog(const LEAP_LOG_EVENT *log_event)
+	void LeapService::handleOnLog(const LEAP_LOG_EVENT* logEvent)
 	{
-		if (!onLogMessage.empty()) {
-			onLogMessage(log_event->severity, log_event->timestamp, log_event->message);
-		}
+		if (!onLogMessage.empty())
+			onLogMessage(logEvent->severity, logEvent->timestamp, logEvent->message);
 	}
 
-	void LeapService::handleOnLogs(const LEAP_LOG_EVENTS *log_events)
+	void LeapService::handleOnLogs(const LEAP_LOG_EVENTS* logEvents)
 	{
-		if (!onLogMessage.empty()) {
-			for (int i = 0; i < (int)(log_events->nEvents); i++) {
-				const LEAP_LOG_EVENT *log_event = &log_events->events[i];
-				onLogMessage(log_event->severity, log_event->timestamp, log_event->message);
+		if (!onLogMessage.empty())
+		{
+			for (int i = 0; i < (int)(logEvents->nEvents); i++)
+			{
+				const LEAP_LOG_EVENT* logEvent = &logEvents->events[i];
+				onLogMessage(logEvent->severity, logEvent->timestamp, logEvent->message);
 			}
 		}
 	}
 
-	void LeapService::handleOnPolicy(const LEAP_POLICY_EVENT *policy_event)
+	void LeapService::handleOnPolicy(const LEAP_POLICY_EVENT* policyEvent)
 	{
-		if (!onPolicy.empty()) {
-			onPolicy(policy_event->current_policy);
-		}
+		if (!onPolicy.empty())
+			onPolicy(policyEvent->current_policy);
 	}
 
-	void LeapService::handleOnConfigChange(const LEAP_CONFIG_CHANGE_EVENT *config_change_event)
+	void LeapService::handleOnConfigChange(const LEAP_CONFIG_CHANGE_EVENT* configChangeEvent)
 	{
-		if (!onConfigChange.empty()) {
-			onConfigChange(config_change_event->requestID, config_change_event->status);
-		}
+		if (!onConfigChange.empty())
+			onConfigChange(configChangeEvent->requestID, configChangeEvent->status);
 	}
 
-	void LeapService::handleOnConfigResponse(const LEAP_CONFIG_RESPONSE_EVENT *config_response_event)
+	void LeapService::handleOnConfigResponse(const LEAP_CONFIG_RESPONSE_EVENT* configResponseEvent)
 	{
-		if (!onConfigResponse.empty()) {
-			onConfigResponse(config_response_event->requestID, config_response_event->value);
-		}
+		if (!onConfigResponse.empty())
+			onConfigResponse(configResponseEvent->requestID, configResponseEvent->value);
 	}
 
-	void LeapService::handleOnImage(const LEAP_IMAGE_EVENT *image_event)
+	void LeapService::handleOnImage(const LEAP_IMAGE_EVENT* image_event)
 	{
-		if (!onImage.empty()) {
+		if (!onImage.empty())
 			onImage(image_event);
-		}
 	}
 
-	void LeapService::handleOnPointMappingChange(
-		const LEAP_POINT_MAPPING_CHANGE_EVENT *point_mapping_change_event)
+	void LeapService::handleOnPointMappingChange(const LEAP_POINT_MAPPING_CHANGE_EVENT* pointMappingChangeEvent)
 	{
-		if (!onPointMappingChange.empty()) {
-			onPointMappingChange(point_mapping_change_event);
-		}
+		if (!onPointMappingChange.empty())
+			onPointMappingChange(pointMappingChangeEvent);
 	}
 
-	void LeapService::handleOnHeadPose(const LEAP_HEAD_POSE_EVENT *head_pose_event)
+	void LeapService::handleOnHeadPose(const LEAP_HEAD_POSE_EVENT* headPoseEvent)
 	{
-		if (!onHeadPose.empty()) {
-			onHeadPose(head_pose_event);
-		}
+		if (!onHeadPose.empty())
+			onHeadPose(headPoseEvent);
 	}
 
 	void LeapService::onStartUp()

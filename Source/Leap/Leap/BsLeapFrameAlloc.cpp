@@ -28,7 +28,8 @@ namespace bs
 		data += sizeof(LeapFrame);
 		get()->mHands = reinterpret_cast<LeapHand*>(data);
 
-		for (uint32_t i = 0; i < trackingEvent->nHands; ++i) {
+		for (uint32_t i = 0; i < trackingEvent->nHands; ++i)
+		{
 			std::memcpy(data, trackingEvent->pHands + i, sizeof(LeapHand));
 			data += sizeof(LeapHand);
 		}
@@ -47,7 +48,6 @@ namespace bs
 		resize(sizeBytesNumberOfHands(nHands));
 	}
 
-	/** Returns the number of bytes needed to allocate a LeapFrame data. */
 	template <typename A>
 	size_t LeapFrameAllocT<A>::sizeBytesNumberOfHands(uint32_t nHands)
 	{

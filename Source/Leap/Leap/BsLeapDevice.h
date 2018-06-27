@@ -20,7 +20,7 @@ namespace bs
 	{
 	public:
 		/** Leap device constructor. */
-		void set(void* deviceHandle,
+		void set(LeapDeviceHandle deviceHandle,
 				float horizontalViewAngle,
 				float verticalViewAngle,
 				float range,
@@ -40,7 +40,7 @@ namespace bs
 		}
 
 		/** For internal use only. */
-		void* getHandle() const { return mHandle; }
+		LeapDeviceHandle getHandle() const { return mHandle; }
 
 		/**
 		 * The angle in radians of view along the x axis of this device.
@@ -126,7 +126,7 @@ namespace bs
 
 	private:
 		/** Handle to a Leap device object. */
-		void* mHandle;
+		LeapDeviceHandle mHandle;
 
 		/** The angle in radians of view along the x axis of this device. */
 		float mHorizontalViewAngle;
