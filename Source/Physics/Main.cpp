@@ -54,16 +54,30 @@ namespace bs
 		String suffix = (chirality == eLeapHandType_Left) ? "_L" : "_R";
 
 		HSceneObject handGraphicsSO = SceneObject::create("GraphicsHands" + suffix);
-		handGraphicsSO->addComponent<CLeapCapsuleHand>();
-		handGraphicsSO->addComponent<CLeapHandEnableDisable>();
+
+		HLeapCapsuleHand handModel = handGraphicsSO->addComponent<CLeapCapsuleHand>();
+		handModel->mChirality = chirality;
+
+		HLeapHandEnableDisable handTransition = handGraphicsSO->addComponent<CLeapHandEnableDisable>();
 
 		HMesh sphereMesh = gBuiltinResources().getMesh(BuiltinMesh::Sphere);
 
 		HSceneObject palmSO = SceneObject::create("palm" + suffix);
+
 		HRenderable palmRenderable = palmSO->addComponent<CRenderable>();
 		palmRenderable->setMesh(sphereMesh);
 
 		palmSO->setParent(handGraphicsSO);
+
+		for (UINT32 i = 0; i < 5; ++i)
+		{
+			HSceneObject fingerSO = SceneObject::create("finger" + i + suffix);
+
+			HRenderable fingerRenderable = fingerSO->addComponent<CRenderable>();
+			fingerRenderable->setMesh(sphereMesh);
+
+			fingerSO->setParent(handGraphicsSO);
+		}
 
 		//handGraphicsSO->setActive(false);
 
@@ -245,7 +259,7 @@ namespace bs
 
 		// Make the camera a child of the character scene object, and position it roughly at eye level
 		sceneCameraSO->setParent(characterSO);
-		sceneCameraSO->setPosition(Vector3(0.0f, 1.8f * 0.5f - 0.1f, 0.0f));
+		sceneCameraSO->setPosition(Vector3(0.0f, 1.8f, 0.0f));
 
 		/************************************************************************/
 		/* 									SKYBOX                       		*/
@@ -302,7 +316,7 @@ namespace bs
 				spawnPos.y += 0.5f;
 
 				sphereSO->setPosition(spawnPos);
-				sphereSO->setScale(Vector3(0.3f, 0.3f, 0.3f));
+				//sphereSO->setScale(Vector3(0.3f, 0.3f, 0.3f));
 
 				// Apply force to the sphere, launching it forward in the camera's view direction
 				sphereRigidbody->addForce(sceneCameraSO->getTransform().getForward() * 40.0f, ForceMode::Velocity);
@@ -344,10 +358,12 @@ namespace bs
 		/* 									HANDS	                     		*/
 		/************************************************************************/
 
-		HSceneObject leapSO = SceneObject::create("LeapProvider");
+		HSceneObject leapSO = SceneObject::create("LeapServiceProvider");
+
 		leapSO->addComponent<CLeapServiceProvider>();
 
 		HSceneObject handsSO = SceneObject::create("Hands");
+
 		HLeapHandModelManager handModels = handsSO->addComponent<CLeapHandModelManager>();
 
 		setUpHand(handsSO, eLeapHandType_Left);
@@ -356,8 +372,7 @@ namespace bs
 		HSceneObject graphicsL = handsSO->findChild("GraphicsHands_L");
 		HSceneObject graphicsR = handsSO->findChild("GraphicsHands_R");
 
-		handModels->addNewGroup("GraphicsHands",
-			graphicsL->getComponent<CLeapCapsuleHand>(),
+		handModels->addNewGroup("GraphicsHands", graphicsL->getComponent<CLeapCapsuleHand>(),
 			graphicsR->getComponent<CLeapCapsuleHand>());
 	}
 }

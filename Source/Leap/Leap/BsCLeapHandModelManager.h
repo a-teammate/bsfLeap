@@ -16,47 +16,45 @@ namespace bs
 	 */
 
 	/**
-	 * The HandModelManager manages a pool of LeapHandModelBases and makes
-	 * HandRepresentations when it detects a Leap Hand from LeapProvider.
+	 * The HandModelManager manages a pool of LeapHandModelBases and makes LeapHandRepresentations when it detects a
+	 * LeapHand from LeapServiceProvider.
 	 *
-	 * When a LeapHandRepresentation is created, a HandModelBase is removed from the
-	 * pool. When a HandRepresentation is finished, its HandModelBase is returned to
-	 * the pool.
+	 * When a LeapHandRepresentation is created, a LeapHandModelBase is removed from the pool. When a LeapHandRepresentation 
+	 * is finished, its LeapHandModelBase is returned to the pool.
 	 */
 	class CLeapHandModelManager : public Component
 	{
 	public:
 		/**
-		 * ModelGroup contains a left/right pair of HandModelBase's
-		 * @param modelList The HandModelBases available for use by
-		 * HandRepresentations
-		 * @param modelsCheckedOut The HandModelBases currently in use by active
-		 * HandRepresentations
-		 * @param IsEnabled determines whether the ModelGroup is active at app
-		 * Start(), though ModelGroup's are controlled with the EnableGroup() &
-		 * DisableGroup methods.
+		 * ModelGroup contains a left/right pair of LeapHandModelBases
+		 * @param mModelList The LeapHandModelBases available for use by LeapHandRepresentations
+		 * @param mModelsCheckedOut The HandModelBases currently in use by active HandRepresentations
+		 * @param mIsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled
+		 * with the EnableGroup & DisableGroup methods.
 		 */
 		class ModelGroup
 		{
 		public:
 			String mGroupName;
-			CLeapHandModelManager* mHandModelManager;
 
 			HLeapHandModelBase mLeftModel;
-			bool mIsLeftToBeSpawned;
 			HLeapHandModelBase mRightModel;
-			bool mIsRightToBeSpawned;
+			bool mIsLeftToBeSpawned = false;
+			bool mIsRightToBeSpawned = false;
 
-			Vector<CLeapHandModelBase *> mModelList;
-			Vector<CLeapHandModelBase *> mModelsCheckedOut;
+			Vector<HLeapHandModelBase> mModelList;
+			Vector<HLeapHandModelBase> mModelsCheckedOut;
 
 			bool mIsEnabled = true;
+			CLeapHandModelManager* mHandModelManager = NULL;
 
-			/*Looks for suitable HandModelBase is the ModelGroup's modelList, if found,
-				* it is added to modelsCheckedOut. If not, one can be cloned */
-			CLeapHandModelBase *tryGetModel(eLeapHandType chirality, LeapModelType modelType);
+			/*
+			 * Looks for suitable HandModelBase is the ModelGroup's modelList, if found, it is added to modelsCheckedOut. 
+			 * If not, one can be cloned.
+			 */
+			HLeapHandModelBase tryGetModel(eLeapHandType chirality, LeapModelType modelType);
 
-			void returnToGroup(CLeapHandModelBase *model);
+			void returnToGroup(HLeapHandModelBase model);
 		};
 
 	public:
@@ -69,14 +67,12 @@ namespace bs
 		/** Sets the LeapServiceProvider used to drive hands. */
 		void setLeapProvider(HLeapServiceProvider provider);
 
-		void returnToPool(CLeapHandModelBase *model);
+		void returnToPool(HLeapHandModelBase model);
 
 		/**
-		 * MakeHandRepresentation receives a Hand and combines that with a
-		 * HandModelBase to create a HandRepresentation
+		 * MakeHandRepresentation receives a Hand and combines that with a HandModelBase to create a HandRepresentation
 		 * @param hand The Leap Hand data to be drive a HandModelBase
-		 * @param modelType Filters for a type of hand model, for example, physics or
-		 * graphics hands.
+		 * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
 		 */
 		LeapHandRepresentation *makeHandRepresentation(LeapHand *hand, LeapModelType modelType);
 
@@ -90,22 +86,16 @@ namespace bs
 		virtual void onFixedFrame(const LeapFrame* frame);
 
 		/**
-		* Updates HandRepresentations based in the specified HandRepresentation
-		* Dictionary. Active HandRepresentation instances are updated if the hand
-		* they represent is still present in the Provider's CurrentFrame; otherwise,
-		* the HandRepresentation is removed. If new Leap Hand objects are present in
-		* the Leap HandRepresentation Dictionary, new HandRepresentations are created
-		* and added to the dictionary.
-		* @param handReps = A dictionary of Leap Hand ID's with a paired
-		* HandRepresentation
-		* @param modelType Filters for a type of hand model, for example, physics or
-		* graphics hands.
-		* @param frame The Leap Frame containing Leap Hand data for each currently
-		* tracked hand
-		*/
-		virtual void
-		updateHandRepresentations(Map<int, LeapHandRepresentation *> &handReps,
-			LeapModelType modelType, const LeapFrame* frame);
+		 * Updates HandRepresentations based in the specified HandRepresentation Dictionary. Active HandRepresentation
+		 * instances are updated if the hand they represent is still present in the Provider's CurrentFrame; otherwise,
+		 * the HandRepresentation is removed. If new Leap Hand objects are present in the Leap HandRepresentation
+		 * Dictionary, new HandRepresentations are created and added to the dictionary.
+		 * @param handReps = A dictionary of Leap Hand ID's with a paired HandRepresentation
+		 * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+		 * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
+		 */
+		virtual void updateHandRepresentations(Map<int, LeapHandRepresentation*> &handReps, LeapModelType modelType,
+			const LeapFrame* frame);
 
 		/** Popuates the ModelPool with the contents of the ModelCollection */
 		void start() {
@@ -115,7 +105,7 @@ namespace bs
 		}
 
 	private:
-		void initializeModelGroup(ModelGroup *group);
+		void initializeModelGroup(ModelGroup* group);
 
 	public:
 		void addNewGroup(String groupName, HLeapHandModelBase leftModel,
@@ -135,20 +125,17 @@ namespace bs
 		//}
 
 		/**
-		* EnableGroup finds suitable HandRepresentations and adds HandModelBases from
-		* the ModelGroup, returns them to their ModelGroup and sets the groups
-		* IsEnabled to true.
-		* @param groupName Takes a string that matches the ModelGroup's groupName
-		* serialized in the Inspector
-		*/
+		 * EnableGroup finds suitable HandRepresentations and adds HandModelBases from the ModelGroup, returns them to
+		 * their ModelGroup and sets the groups IsEnabled to true.
+		 * @param groupName Takes a string that matches the ModelGroup's groupName
+		 * serialized in the Inspector
+		 */
 		void enableGroup(String groupName);
 
 		/**
-		* DisableGroup finds and removes the ModelGroup's HandModelBases from their
-		* HandRepresentations, returns them to their ModelGroup and sets the groups
-		* IsEnabled to false.
-		* @param groupName Takes a string that matches the ModelGroup's groupName
-		* serialized in the Inspector
+		* DisableGroup finds and removes the ModelGroup's HandModelBases from their HandRepresentations, returns them
+		* to their ModelGroup and sets the groups IsEnabled to false.
+		* @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
 		*/
 		void disableGroup(String groupName);
 
@@ -159,16 +146,16 @@ namespace bs
 		bool mPhysicsEnabled = true;
 
 	protected:
-		Map<int, LeapHandRepresentation *> mGraphicsHandReps;
-		Map<int, LeapHandRepresentation *> mPhysicsHandReps;
+		Map<int, LeapHandRepresentation*> mGraphicsHandReps;
+		Map<int, LeapHandRepresentation*> mPhysicsHandReps;
 
 	private:
-		Vector<ModelGroup *> mModelPool;
+		Vector<ModelGroup*> mModelPool;
 
-		Vector<LeapHandRepresentation *> mActiveHandReps;
+		Vector<LeapHandRepresentation*> mActiveHandReps;
 
-		Map<CLeapHandModelBase *, ModelGroup *> mModelGroupMapping;
-		Map<CLeapHandModelBase *, LeapHandRepresentation *> mModelToHandRepMapping;
+		Map<CLeapHandModelBase*, ModelGroup*> mModelGroupMapping;
+		Map<CLeapHandModelBase*, LeapHandRepresentation*> mModelToHandRepMapping;
 
 		HLeapServiceProvider mProvider;
 

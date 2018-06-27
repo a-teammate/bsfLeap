@@ -18,8 +18,7 @@ namespace bs
 	class LeapHandRepresentation
 	{
 	public:
-		LeapHandRepresentation(CLeapHandModelManager *parent, LeapHand *hand,
-			eLeapHandType chirality, LeapModelType type);
+		LeapHandRepresentation(CLeapHandModelManager *parent, LeapHand *hand, eLeapHandType chirality, LeapModelType type);
 
 		int getHandId() const { return mHandID; }
 
@@ -27,20 +26,20 @@ namespace bs
 
 		LeapModelType getType() const { return mType; }
 
-		LeapHand *getMostRecentHand() const { return mMostRecentHand; }
+		LeapHand* getMostRecentHand() const { return mMostRecentHand; }
 
 		/** To be called if the HandRepresentation no longer has a LeapHand. */
 		void finish();
 
-		void addModel(CLeapHandModelBase *model);
+		void addModel(HLeapHandModelBase model);
 
-		void removeModel(CLeapHandModelBase *model);
+		void removeModel(HLeapHandModelBase model);
 
 		/** Calls Updates in HandModelBases. */
-		void update(LeapHand *hand);
+		void update(LeapHand* hand);
 
 	public:
-		Vector<CLeapHandModelBase*> mHandModels;
+		Vector<HLeapHandModelBase> mHandModels;
 
 		int mLastUpdatedTime;
 

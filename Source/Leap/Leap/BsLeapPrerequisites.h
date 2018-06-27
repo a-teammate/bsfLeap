@@ -47,6 +47,7 @@
 
 namespace bs
 {
+	class CLeapCapsuleHand;
 	class CLeapHandEnableDisable;
 	class CLeapHandModel;
 	class CLeapHandModelBase;
@@ -98,6 +99,7 @@ namespace bs
 	*/
 
 	// Game object handles
+	typedef GameObjectHandle<CLeapCapsuleHand> HLeapCapsuleHand;
 	typedef GameObjectHandle<CLeapHandEnableDisable> HLeapHandEnableDisable;
 	typedef GameObjectHandle<CLeapHandModel> HLeapHandModel;
 	typedef GameObjectHandle<CLeapHandModelBase> HLeapHandModelBase;

@@ -10,24 +10,28 @@ using namespace std::placeholders;
 
 namespace bs
 {
-	// CLeapHandModelManager::ModelGroup
-
-	CLeapHandModelBase *
-	CLeapHandModelManager::ModelGroup::tryGetModel(eLeapHandType chirality,
-		LeapModelType modelType)
+	HLeapHandModelBase CLeapHandModelManager::ModelGroup::tryGetModel(eLeapHandType chirality, LeapModelType modelType)
 	{
-		for (auto it = mModelList.begin(); it != mModelList.end(); ++it) {
-			CLeapHandModelBase *model = *it;
-			if (model->getChirality() == chirality && model->getType() == modelType) {
+		for (auto it = mModelList.begin(); it != mModelList.end(); ++it)
+		{
+			HLeapHandModelBase model = *it;
+			if (model->getChirality() == chirality && model->getType() == modelType)
+			{
 				mModelList.erase(it);
 				mModelsCheckedOut.push_back(model);
 				return model;
 			}
 		}
-		return NULL;
+		return HLeapHandModelBase();
 	}
 
-	// CLeapHandModelManager
+	void CLeapHandModelManager::ModelGroup::returnToGroup(HLeapHandModelBase model)
+	{
+		auto iterFind = std::find(mModelsCheckedOut.begin(), mModelsCheckedOut.end(), model);
+		mModelsCheckedOut.erase(iterFind);
+		mModelList.push_back(model);
+		mHandModelManager->mModelToHandRepMapping.erase(model.get());
+	}
 
 	CLeapHandModelManager::CLeapHandModelManager()
 	{
@@ -44,14 +48,16 @@ namespace bs
 
 	void CLeapHandModelManager::setLeapProvider(HLeapServiceProvider provider)
 	{
-		if (mProvider != NULL) {
+		if (mProvider != NULL)
+		{
 			mOnFixedFrameConn.disconnect();
 			mOnUpdateFrameConn.disconnect();
 		}
 
 		mProvider = provider;
 
-		if (mProvider != NULL) {
+		if (mProvider != NULL)
+		{
 			mOnFixedFrameConn = mProvider->onFixedFrame.connect(
 				std::bind(&CLeapHandModelManager::onFixedFrame, this, _1));
 			mOnUpdateFrameConn = mProvider->onUpdateFrame.connect(
@@ -59,36 +65,30 @@ namespace bs
 		}
 	}
 
-	void CLeapHandModelManager::ModelGroup::returnToGroup(CLeapHandModelBase *model)
+	void CLeapHandModelManager::returnToPool(HLeapHandModelBase model)
 	{
-		auto iterFind =
-			std::find(mModelsCheckedOut.begin(), mModelsCheckedOut.end(), model);
-		mModelsCheckedOut.erase(iterFind);
-		mModelList.push_back(model);
-		mHandModelManager->mModelToHandRepMapping.erase(model);
-	}
-
-	void CLeapHandModelManager::returnToPool(CLeapHandModelBase *model)
-	{
-		ModelGroup *modelGroup = mModelGroupMapping.at(model);
+		ModelGroup *modelGroup = mModelGroupMapping.at(model.get());
 		// First see if there is another active Representation that can use this
-		for (int i = 0; i < mActiveHandReps.size(); i++) {
+		for (int i = 0; i < mActiveHandReps.size(); i++)
+		{
 			LeapHandRepresentation *rep = mActiveHandReps[i];
-			if (rep->getChirality() == model->getChirality() &&
-				rep->getType() == model->getType()) {
+			if (rep->getChirality() == model->getChirality() && rep->getType() == model->getType())
+			{
 				bool modelFromGroupFound = false;
 				// Represention does not contain a model from modelGroup
-				for (int j = 0; j < modelGroup->mModelsCheckedOut.size(); j++) {
-					CLeapHandModelBase *modelToCompare = modelGroup->mModelsCheckedOut[j];
-					for (int k = 0; k < rep->mHandModels.size(); k++) {
-						if (rep->mHandModels[k] == modelToCompare) {
+				for (int j = 0; j < modelGroup->mModelsCheckedOut.size(); j++)
+				{
+					HLeapHandModelBase modelToCompare = modelGroup->mModelsCheckedOut[j];
+					for (int k = 0; k < rep->mHandModels.size(); k++)
+					{
+						if (rep->mHandModels[k] == modelToCompare)
 							modelFromGroupFound = true;
-						}
 					}
 				}
-				if (!modelFromGroupFound) {
+				if (!modelFromGroupFound)
+				{
 					rep->addModel(model);
-					mModelToHandRepMapping[model] = rep;
+					mModelToHandRepMapping[model.get()] = rep;
 					return;
 				}
 			}
@@ -100,35 +100,36 @@ namespace bs
 	/** Updates the graphics HandRepresentations. */
 	void CLeapHandModelManager::onUpdateFrame(const LeapFrame* frame)
 	{
-		if (frame != NULL && mGraphicsEnabled) {
+		if (frame != NULL && mGraphicsEnabled)
 			updateHandRepresentations(mGraphicsHandReps, LeapModelType::Graphics, frame);
-		}
 	}
 
 	/** Updates the physics HandRepresentations. */
 	void CLeapHandModelManager::onFixedFrame(const LeapFrame* frame)
 	{
-		if (frame != NULL && mPhysicsEnabled) {
+		if (frame != NULL && mPhysicsEnabled)
 			updateHandRepresentations(mPhysicsHandReps, LeapModelType::Physics, frame);
-		}
 	}
 
-	void CLeapHandModelManager::updateHandRepresentations(
-		Map<int, LeapHandRepresentation *> &handReps,
+	void CLeapHandModelManager::updateHandRepresentations(Map<int, LeapHandRepresentation *> &handReps,
 		LeapModelType modelType, const LeapFrame* frame)
 	{
-		for (UINT32 i = 0; i < frame->mNumberOfHands; i++) {
+		for (UINT32 i = 0; i < frame->mNumberOfHands; i++)
+		{
 			LeapHand *curHand = &frame->mHands[i];
 			LeapHandRepresentation *rep;
 			auto it = handReps.find(curHand->mId);
-			if (it == handReps.end()) {
+			if (it == handReps.end())
+			{
 				rep = makeHandRepresentation(curHand, modelType);
 				handReps[curHand->mId] = rep;
 			}
-			else {
+			else
+			{
 				rep = it->second;
 			}
-			if (rep != NULL) {
+			if (rep != NULL)
+			{
 				rep->mIsMarked = true;
 				rep->update(curHand);
 				rep->mLastUpdatedTime = (int)frame->mFramerate;
@@ -140,18 +141,21 @@ namespace bs
 		for (auto it : handReps)
 		{
 			LeapHandRepresentation *rep = it.second;
-			if (rep->mIsMarked) {
+			if (rep->mIsMarked)
+			{
 				rep->mIsMarked = false;
 			}
-			else {
-				/** Initialize toBeDeleted with a value to be deleted */
+			else
+			{
+				// Initialize toBeDeleted with a value to be deleted
 				// Debug.Log("Finishing");
 				toBeDeleted = rep;
 			}
 		}
-		/**Inform the representation that we will no longer be giving it any hand
-		* updates because the corresponding hand has gone away */
-		if (toBeDeleted != NULL) {
+		// Inform the representation that we will no longer be giving it any hand updates because the corresponding 
+		// hand has gone away
+		if (toBeDeleted != NULL)
+		{
 			auto it = handReps.find(toBeDeleted->getHandId());
 			handReps.erase(it);
 			toBeDeleted->finish();
@@ -161,56 +165,58 @@ namespace bs
 	void CLeapHandModelManager::initializeModelGroup(ModelGroup *group)
 	{
 		// Prevent the ModelGroup be initialized by multiple times
-		auto it = std::find_if(mModelGroupMapping.begin(), mModelGroupMapping.end(),
+		auto itFind = std::find_if(mModelGroupMapping.begin(), mModelGroupMapping.end(),
 			[&](auto x) { return x.second == group; });
-		if (it != mModelGroupMapping.end()) {
+
+		if (itFind != mModelGroupMapping.end())
 			return;
-		}
 
 		group->mHandModelManager = this;
 
 		HLeapHandModelBase leftModel;
 		HLeapHandModelBase rightModel;
-		if (group->mIsLeftToBeSpawned) {
-			// CLeapHandModelBase *modelToSpawn = group->mLeftModel;
-			// GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
-			// leftModel = spawnedGO.GetComponent<HandModelBase>();
-			// leftModel->transform.parent = this.transform;
+		if (group->mIsLeftToBeSpawned)
+		{
+			HLeapHandModelBase modelToSpawn = group->mLeftModel;
+			HSceneObject spawnedGO = modelToSpawn->SO()->clone();
+			leftModel = spawnedGO->getComponent<CLeapHandModelBase>();
 		}
-		else {
+		else
+		{
 			leftModel = group->mLeftModel;
 		}
-		if (leftModel != NULL) {
+		if (leftModel != NULL)
+		{
 			group->mModelList.push_back(leftModel);
-			mModelGroupMapping[leftModel] = group;
+			mModelGroupMapping[leftModel.get()] = group;
 		}
 
-		if (group->mIsRightToBeSpawned) {
-			// CLeapHandModelBase modelToSpawn = group->mRightModel;
-			// GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
-			// rightModel = spawnedGO.GetComponent<CLeapHandModelBase *>();
-			// rightModel.transform.parent = this.transform;
+		if (group->mIsRightToBeSpawned)
+		{
+			HLeapHandModelBase modelToSpawn = group->mRightModel;
+			HSceneObject spawnedGO = modelToSpawn->SO()->clone();
+			rightModel = spawnedGO->getComponent<CLeapHandModelBase>();
 		}
-		else {
+		else
+		{
 			rightModel = group->mRightModel;
 		}
-		if (rightModel != NULL) {
+		if (rightModel != NULL)
+		{
 			group->mModelList.push_back(rightModel);
-			mModelGroupMapping[rightModel] = group;
+			mModelGroupMapping[rightModel.get()] = group;
 		}
 	}
 
-	void CLeapHandModelManager::addNewGroup(String groupName,
-		HLeapHandModelBase leftModel,
-		HLeapHandModelBase rightModel)
+	void CLeapHandModelManager::addNewGroup(String groupName, HLeapHandModelBase leftModel, HLeapHandModelBase rightModel)
 	{
-		ModelGroup *newGroup = new ModelGroup;
-		newGroup->mGroupName = groupName;
-		newGroup->mLeftModel = leftModel;
-		newGroup->mRightModel = rightModel;
-		newGroup->mIsEnabled = true;
-		mModelPool.push_back(newGroup);
-		initializeModelGroup(newGroup);
+		ModelGroup *group = new ModelGroup;
+		group->mGroupName = groupName;
+		group->mLeftModel = leftModel;
+		group->mRightModel = rightModel;
+		mModelPool.push_back(group);
+
+		initializeModelGroup(group);
 	}
 
 	void CLeapHandModelManager::removeGroup(String groupName)
@@ -224,17 +230,20 @@ namespace bs
 
 	void CLeapHandModelManager::enableGroup(String groupName)
 	{
-		ModelGroup *group = NULL;
-		for (int i = 0; i < mModelPool.size(); i++) {
-			if (mModelPool[i]->mGroupName == groupName) {
+		ModelGroup* group = NULL;
+		for (int i = 0; i < mModelPool.size(); i++)
+		{
+			if (mModelPool[i]->mGroupName == groupName)
+			{
 				group = mModelPool[i];
-				for (int hp = 0; hp < mActiveHandReps.size(); hp++) {
-					LeapHandRepresentation *handRep = mActiveHandReps[hp];
-					CLeapHandModelBase *model =
-						group->tryGetModel(handRep->getChirality(), handRep->getType());
-					if (model != NULL) {
+				for (int hp = 0; hp < mActiveHandReps.size(); hp++)
+				{
+					LeapHandRepresentation* handRep = mActiveHandReps[hp];
+					HLeapHandModelBase model = group->tryGetModel(handRep->getChirality(), handRep->getType());
+					if (model != NULL)
+					{
 						handRep->addModel(model);
-						mModelToHandRepMapping[model] = handRep;
+						mModelToHandRepMapping[model.get()] = handRep;
 					}
 				}
 				group->mIsEnabled = true;
@@ -247,23 +256,26 @@ namespace bs
 
 	void CLeapHandModelManager::disableGroup(String groupName)
 	{
-		ModelGroup *group = NULL;
-		for (int i = 0; i < mModelPool.size(); i++) {
-			if (mModelPool[i]->mGroupName == groupName) {
+		ModelGroup* group = NULL;
+		for (int i = 0; i < mModelPool.size(); i++)
+		{
+			if (mModelPool[i]->mGroupName == groupName)
+			{
 				group = mModelPool[i];
-				for (int m = 0; m < group->mModelsCheckedOut.size(); m++) {
-					CLeapHandModelBase *model = group->mModelsCheckedOut[m];
-					auto it = mModelToHandRepMapping.find(model);
-					if (it != mModelToHandRepMapping.end()) {
-						LeapHandRepresentation *handRep = it->second;
+				for (int m = 0; m < group->mModelsCheckedOut.size(); m++)
+				{
+					HLeapHandModelBase model = group->mModelsCheckedOut[m];
+					auto it = mModelToHandRepMapping.find(model.get());
+					if (it != mModelToHandRepMapping.end())
+					{
+						LeapHandRepresentation* handRep = it->second;
 						handRep->removeModel(model);
 						group->returnToGroup(model);
 						m--;
 					}
 				}
 				// Assert.AreEqual(0, group->mModelsCheckedOut.size(),
-				//                group->mGroupName +
-				//                    "'s modelsCheckedOut List has not been cleared");
+				//                group->mGroupName + "'s modelsCheckedOut List has not been cleared");
 				group->mIsEnabled = false;
 			}
 		}
@@ -274,37 +286,43 @@ namespace bs
 
 	void CLeapHandModelManager::toggleGroup(String groupName)
 	{
-		auto it = std::find_if(mModelPool.begin(), mModelPool.end(),
-			[&](auto x) { return x->mGroupName == groupName; });
-		if (it != mModelPool.end()) {
+		auto it = std::find_if(mModelPool.begin(), mModelPool.end(), [&](auto x) { return x->mGroupName == groupName; });
+		if (it != mModelPool.end())
+		{
 			ModelGroup *modelGroup = *it;
-			if (modelGroup->mIsEnabled == true) {
+			if (modelGroup->mIsEnabled == true)
+			{
 				disableGroup(groupName);
 				modelGroup->mIsEnabled = false;
 			}
-			else {
+			else
+			{
 				enableGroup(groupName);
 				modelGroup->mIsEnabled = true;
 			}
 		}
-		else {
+		else
+		{
 			LOGWRN("A group matching that name does not exisit in the modelPool");
 		}
 	}
 
-	LeapHandRepresentation *
-	CLeapHandModelManager::makeHandRepresentation(LeapHand *hand, LeapModelType modelType)
+	LeapHandRepresentation* CLeapHandModelManager::makeHandRepresentation(LeapHand* hand, LeapModelType modelType)
 	{
 		LeapHandRepresentation *handRep = new LeapHandRepresentation(this, hand, hand->mType, modelType);
-		for (ModelGroup *group : mModelPool) {
-			if (group->mIsEnabled) {
-				CLeapHandModelBase *model = group->tryGetModel(hand->mType, modelType);
-				if (model != NULL) {
+		for (ModelGroup *group : mModelPool)
+		{
+			if (group->mIsEnabled)
+			{
+				HLeapHandModelBase model = group->tryGetModel(hand->mType, modelType);
+				if (model != NULL)
+				{
 					handRep->addModel(model);
-					auto it = mModelToHandRepMapping.find(model);
-					if (it == mModelToHandRepMapping.end()) {
+					auto it = mModelToHandRepMapping.find(model.get());
+					if (it == mModelToHandRepMapping.end())
+					{
 						// model->group = group;
-						mModelToHandRepMapping[model] = handRep;
+						mModelToHandRepMapping[model.get()] = handRep;
 					}
 				}
 			}
@@ -313,8 +331,7 @@ namespace bs
 		return handRep;
 	}
 
-	void CLeapHandModelManager::removeHandRepresentation(
-		LeapHandRepresentation *handRepresentation)
+	void CLeapHandModelManager::removeHandRepresentation(LeapHandRepresentation *handRepresentation)
 	{
 		auto it = std::find(mActiveHandReps.begin(), mActiveHandReps.end(), handRepresentation);
 		mActiveHandReps.erase(it);
@@ -325,12 +342,10 @@ namespace bs
 		if (mProvider != NULL)
 			return;
 
-		Vector<HLeapServiceProvider> arrayProvider =
-			gSceneManager().findComponents<CLeapServiceProvider>();
+		Vector<HLeapServiceProvider> arrayProvider = gSceneManager().findComponents<CLeapServiceProvider>();
 
-		if (arrayProvider.size() == 0) {
+		if (arrayProvider.size() == 0)
 			LOGERR("Couldn't find CLeapServiceProvider component in the scene.");
-		}
 
 		mProvider = arrayProvider[0];
 	}

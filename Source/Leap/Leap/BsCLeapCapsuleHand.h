@@ -26,7 +26,7 @@ namespace bs
 		/** @copydoc CLeapHandModelBase::getChirality */
 		eLeapHandType getChirality() const override
 		{
-			return mHandedness;
+			return mChirality;
 		}
 
 		/** @copydoc CLeapHandModelBase::getType */
@@ -81,13 +81,26 @@ namespace bs
 				//mSphereMaterial = new Material(mMaterial);
 			}
 
-			HSceneObject palm = SO()->findChild("palm");
-
 			if (!mHand)
 				return;
 
-			palm->setPosition(mHand->mPalm.mStabilizedPosition);
-			LOGWRN("LeapTransform " + toString(mHand->mPalm.mStabilizedPosition));
+			Vector3 translation(0.0f, 0.0f, 1.0f);
+			Vector3 scale(0.01f, 0.01f, 0.01f);
+			Transform t(translation, Quaternion::IDENTITY, scale);
+			Matrix4 m = t.getMatrix();
+
+			String suffix = (mChirality == eLeapHandType_Left) ? "_L" : "_R";
+
+			HSceneObject palm = SO()->findChild("palm" + suffix);
+			palm->setPosition(m.multiplyAffine(mHand->mPalm.mPosition));
+			palm->setScale(Vector3(0.2f, 0.2f, 0.2f));
+
+			for (UINT32 i = 0; i < 5; ++i)
+			{
+				HSceneObject finger = SO()->findChild("finger" + i + suffix);
+				finger->setPosition(m.multiplyAffine(mHand->mDigits[i].mBones[3].mNextJoint));
+				finger->setScale(Vector3(0.1f, 0.1f, 0.1f));
+			}
 
 			////Update all joint spheres in the fingers
 			//foreach(var finger in mHand->Fingers) {
@@ -272,6 +285,9 @@ namespace bs
 		//	return mesh;
 		//}
 
+	public:
+		eLeapHandType mChirality;
+
 	private:
 		const int TOTAL_JOINT_COUNT = 4 * 5;
 		const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
@@ -283,7 +299,6 @@ namespace bs
 		//static const Color _leftColorList[] = { Color(0.0f, 0.0f, 1.0f), Color(0.2f, 0.0f, 0.4f), Color(0.0f, 0.2f, 0.2f) };
 		//static const Color _rightColorList[] = { Color(1.0f, 0.0f, 0.0f), Color(1.0f, 1.0f, 0.0f), Color(1.0f, 0.5f, 0.0f) };
 
-		eLeapHandType mHandedness;
 
 		bool _showArm = true;
 

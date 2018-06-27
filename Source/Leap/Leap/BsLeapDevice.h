@@ -13,17 +13,8 @@ namespace bs
 	/**
 	 * The LeapDevice class represents a physically connected device.
 	 * 
-	 * The LeapDevice class contains information related to a particular connected
-	 * device such as device id, field of view relative to the device,
-	 * and the position and orientation of the device in relative coordinates.
-	 * 
-	 * The position and orientation describe the alignment of the device relative to the user.
-	 * The alignment relative to the user is only descriptive. Aligning devices to users
-	 * provides consistency in the parameters that describe user interactions.
-	 * 
-	 * Note that LeapDevice objects can be invalid, which means that they do not contain
-	 * valid device information and do not correspond to a physical device.
-	 * @since 1.0
+	 * The LeapDevice class contains information related to a particular connected device such as device id, field of view
+	 * relative to the device, and the position and orientation of the device in relative coordinates.
 	 */
 	class LeapDevice
 	{
@@ -48,9 +39,7 @@ namespace bs
 			mSerialNumber = serialNumber;
 		}
 
-		/**
-		 * For internal use only.
-		 */
+		/** For internal use only. */
 		void* getHandle() const { return mHandle; }
 
 		/**
