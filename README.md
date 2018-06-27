@@ -3,9 +3,9 @@
 - Install git (https://git-scm.com) and CMake 3.9.0 or higher (https://cmake.org)
 	- Ensure they are added to your *PATH* environment variable
 - Run the following commands in the terminal/command line:
-    - `git clone https://github.com/GameFoundry/bsf.git`
-	- `git clone https://github.com/GameFoundry/bsfExamples.git`
-	- `cd bsfExamples`
+	- `git clone https://github.com/ivalduan/bsf.git`
+	- `git clone https://github.com/ivalduan/bsfLeap.git`
+	- `cd bsfLeap`
 	- `mkdir Build`
 	- `cd Build`
 	- `cmake -G "$generator$" ../`
@@ -16,15 +16,10 @@
 			- `Xcode`
 			- See all valid generators: [cmake-generators](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html)
 - Build the project using your chosen tool
-	- Build files are in the `bsfExamples/Build` folder
+	- Build files are in the `bsfLeap/Build` folder
 - Run the examples
-	- Example binaries are placed in the `bsfExamples/bin` folder
+	- Build with BUILD_LEAP_EXAMPLES ON
+	- Example binaries are placed in the `bsfLeap/bin` folder
 
 # Examples
-* Audio - Demonstrates how to import audio clips and use audio sources and listeners.
-* CustomMaterials - Demonstrates how to use custom materials that override vertex, surface and lighting aspects of the renderer.
-* GUI - Demonstrates how to use the built-in GUI system. Demoes a variety of basic controls, the layout system and shows how to use styles to customize the look of GUI elements.
-* LowLevelRendering - Demonstrates how to use the low-level rendering system to manually issue rendering commands. This is similar to using DirectX/OpenGL/Vulkan, except it uses bs::framework's platform-agnostic rendering layer.
-* PhysicallyBasedRendering - Demonstrates the physically based renderer using the built-in shaders & lighting by rendering an object in a HDR environment.
 * Physics - Demonstrates the use of variety of physics related components, including a character controller, rigidbodies and colliders.
-* SkeletalAnimation - Demonstrates how to import an animation clip and animate a 3D model using skeletal (skinned) animation.
