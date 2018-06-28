@@ -25,17 +25,17 @@ namespace bs
 		/** @copydoc CLeapHandModelBase::getChirality */
 		eLeapHandType getChirality() const override { return mChirality; }
 
-		/** @copydoc CLeapHandModelBase::getType */
-		LeapModelType getType() const override { return LeapModelType::Graphics; }
+		/** @copydoc CLeapHandModelBase::getKind */
+		LeapModelKind getKind() const override { return LeapModelKind::Graphics; }
 
 		/** @copydoc CLeapHandModelBase::getLeapHand */
-		LeapHand* getLeapHand() const override { return mHand; }
+		const LeapHand* getLeapHand() const override { return mHand; }
 
 		/** @copydoc CLeapHandModelBase::setLeapHand */
-		void setLeapHand(LeapHand* hand) override { mHand = hand; }
+		void setLeapHand(const LeapHand* hand) override { mHand = hand; }
 
 		/** @copydoc CLeapHandModelBase::init */
-		void init() override
+		void initHand() override
 		{
 			if (mMaterial != NULL) {
 				//mSphereMaterial = new Material(mMaterial);
@@ -59,8 +59,8 @@ namespace bs
 			//}
 		}
 
-		/** @copydoc CLeapHandModelBase::update */
-		void update() override
+		/** @copydoc CLeapHandModelBase::updateHand */
+		void updateHand() override
 		{
 			if (mSpherePositions.size() != TOTAL_JOINT_COUNT)
 				mSpherePositions.resize(TOTAL_JOINT_COUNT);
@@ -300,7 +300,9 @@ namespace bs
 		float _palmRadius = 0.015f;
 
 		Material* mSphereMaterial;
-		LeapHand* mHand = NULL;
+
+		const LeapHand* mHand = NULL;
+
 		Vector<Vector3> mSpherePositions;
 
 		/************************************************************************/

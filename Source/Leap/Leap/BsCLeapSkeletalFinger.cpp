@@ -1,0 +1,64 @@
+//************************************ bs::framework - Copyright 2018 Next Limit *****************************************//
+//*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
+
+#include "Leap/BsCLeapSkeletalFinger.h"
+#include "Private/RTTI/BsCLeapSkeletalFingerRTTI.h"
+
+namespace bs
+{
+	CLeapSkeletalFinger::CLeapSkeletalFinger()
+	{
+		setName("LeapSkeletalFinger");
+
+		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
+	}
+
+	CLeapSkeletalFinger::CLeapSkeletalFinger(const HSceneObject& parent)
+		: CLeapFingerModel(parent)
+	{
+		setName("LeapSkeletalFinger");
+
+		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
+	}
+
+	void CLeapSkeletalFinger::initFinger()
+	{
+		setPositions();
+	}
+
+	void CLeapSkeletalFinger::updateFinger()
+	{
+		setPositions();
+	}
+
+	void CLeapSkeletalFinger::setPositions()
+	{
+		for (int i = 0; i < NUM_BONES; ++i)
+		{
+			if (mBones[i] != NULL)
+			{
+				mBones[i]->setPosition(getBoneCenter(i));
+				mBones[i]->setRotation(getBoneRotation(i));
+			}
+		}
+
+		for (int i = 0; i < NUM_JOINTS; ++i)
+		{
+			if (mJoints[i] != NULL)
+			{
+				mJoints[i]->setPosition(getJointPosition(i + 1));
+				mJoints[i]->setRotation(getBoneRotation(i + 1));
+			}
+		}
+	}
+
+	RTTITypeBase* CLeapSkeletalFinger::getRTTIStatic()
+	{
+		return CLeapSkeletalFingerRTTI::instance();
+	}
+
+	RTTITypeBase* CLeapSkeletalFinger::getRTTI() const
+	{
+		return CLeapSkeletalFinger::getRTTIStatic();
+	}
+}

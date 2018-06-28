@@ -9,14 +9,12 @@ namespace bs
 	CLeapCapsuleHand::CLeapCapsuleHand()
 	{
 		setName("LeapCapsuleHand");
-		setFlag(ComponentFlag::AlwaysRun, true);
 	}
 
 	CLeapCapsuleHand::CLeapCapsuleHand(const HSceneObject &parent)
 		: CLeapHandModelBase(parent)
 	{
 		setName("LeapCapsuleHand");
-		setFlag(ComponentFlag::AlwaysRun, true);
 	}
 
 	RTTITypeBase* CLeapCapsuleHand::getRTTIStatic()

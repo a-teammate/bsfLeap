@@ -56,7 +56,7 @@ namespace bs
 		SPtr<LeapDevice> getDeviceActive() const;
 
 		/** Returns the device with provided handle. */
-		SPtr<LeapDevice> getDeviceByHandle(LeapDeviceHandle handle);
+		SPtr<LeapDevice> getDeviceByHandle(LeapDeviceHandle handle) const;
 
 		int64_t getNow();
 
@@ -153,7 +153,7 @@ namespace bs
 		void processMessageLoop();
 
 		/** For internal use only. */
-		SPtr<LeapDevice> findDeviceByHandle(LeapDeviceHandle handle);
+		SPtr<LeapDevice> findDeviceByHandle(LeapDeviceHandle handle) const;
 
 		/** Caches the newest frame by copying the tracking event struct returned by LeapC. */
 		void pushFrame(const LeapFrame *frame);

@@ -2,7 +2,7 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "Leap/BsCLeapHandModel.h"
+#include "Leap/BsCLeapFingerModel.h"
 
 namespace bs
 {
@@ -11,27 +11,22 @@ namespace bs
 	*/
 
 	/**
-	* A hand object consisting of discrete, component parts.
-	*
-	* The hand can have game objects for the palm, wrist and forearm, as well as fingers.
-	*/
-	class CLeapSkeletalHand : public CLeapHandModel
+	 * A finger object consisting of discrete, component parts for each bone.
+	 *
+	 * The graphic objects can include both bones and joints, but both are optional.
+	 */
+	class CLeapSkeletalFinger : public CLeapFingerModel
 	{
 	public:
-		CLeapSkeletalHand(const HSceneObject& parent);
+		CLeapSkeletalFinger(const HSceneObject& parent);
+
+		/** Initializes the finger bones and joints by setting their positions and rotations. */
+		void initFinger() override;
+
+		/** Updates the finger bones and joints by setting their positions and rotations. */
+		void updateFinger() override;
 
 	protected:
-		const float PALM_CENTER_OFFSET = 0.015f;
-
-
-	public:
-		/** Updates the hand and its component parts by setting their positions and
-		* rotations. */
-		void update() override;
-
-	protected:
-		Vector3 getPalmCenter();
-
 		void setPositions();
 
 		/************************************************************************/
@@ -40,18 +35,16 @@ namespace bs
 	protected:
 		friend class SceneObject;
 
-		void start();
-
 		/************************************************************************/
 		/* 								RTTI		                     		*/
 		/************************************************************************/
 	public:
-		friend class ComponentRTTI;
+		friend class CLeapSkeletalFingerRTTI;
 		static RTTITypeBase* getRTTIStatic();
 		RTTITypeBase* getRTTI() const override;
 
 	protected:
-		CLeapSkeletalHand(); // Serialization only
+		CLeapSkeletalFinger();// Serialization only
 	};
 
 	/** @} */

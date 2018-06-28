@@ -2,64 +2,46 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "Leap/BsLeapSkeletalHand.h"
+#include "Leap/BsCLeapSkeletalHand.h"
 
-namespace bs {
+namespace bs
+{
+	/** @addtogroup Leap
+	*  @{
+	*/
 
-/** A physics model for a hand made out of various Rigidbody collider. */
-class LeapRigidHand : LeapSkeletalHand {
-public:
-  LeapModelType getHandModelType { return LeapModelType.Physics; }
+	/** A physics model for a hand made out of various Rigidbody collider. */
+	class CLeapRigidHand : public CLeapSkeletalHand
+	{
+	public:
+		CLeapRigidHand(const HSceneObject& parent);
 
-  float filtering = 0.5f;
+		/** @copydoc CLeapHandModelBase::getKind */
+		LeapModelKind getKind() const override { return LeapModelKind::Physics; }
 
-  bool SupportsEditorPersistence() { return true; }
+		float filtering = 0.5f;
 
-  void InitHand() { base.InitHand(); }
+		bool supportsEditorPersistence() { return true; }
 
-  void UpdateHand() {
-    for (int f = 0; f < fingers.Length; ++f) {
-      if (fingers[f] != null) {
-        fingers[f].UpdateFinger();
-      }
-    }
+		void updateHand() override;
 
-    if (palm != null) {
-      Rigidbody palmBody = palm.GetComponent<Rigidbody>();
-      if (palmBody) {
-        palmBody.MovePosition(GetPalmCenter());
-        palmBody.MoveRotation(GetPalmRotation());
-      } else {
-        palm.position = GetPalmCenter();
-        palm.rotation = GetPalmRotation();
-      }
-    }
+		/************************************************************************/
+		/* 						COMPONENT OVERRIDES                      		*/
+		/************************************************************************/
+	protected:
+		friend class SceneObject;
 
-    if (forearm != null) {
-      // Set arm dimensions.
-      CapsuleCollider capsule = forearm.GetComponent<CapsuleCollider>();
-      if (capsule != null) {
-        // Initialization
-        capsule.direction = 2;
-        forearm.localScale = new Vector3(1f / transform.lossyScale.x,
-                                         1f / transform.lossyScale.y,
-                                         1f / transform.lossyScale.z);
+		/************************************************************************/
+		/* 								RTTI		                     		*/
+		/************************************************************************/
+	public:
+		friend class CLeapCapsuleHandRTTI;
+		static RTTITypeBase* getRTTIStatic();
+		RTTITypeBase* getRTTI() const override;
 
-        // Update
-        capsule.radius = GetArmWidth() / 2f;
-        capsule.height = GetArmLength() + GetArmWidth();
-      }
+	protected:
+		CLeapRigidHand();// Serialization only
+	};
 
-      Rigidbody forearmBody = forearm.GetComponent<Rigidbody>();
-      if (forearmBody) {
-        forearmBody.MovePosition(GetArmCenter());
-        forearmBody.MoveRotation(GetArmRotation());
-      } else {
-        forearm.position = GetArmCenter();
-        forearm.rotation = GetArmRotation();
-      }
-    }
-  }
-}
-
+	/** @} */
 }

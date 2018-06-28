@@ -6,58 +6,58 @@
 
 namespace bs
 {
-	LeapHandRepresentation::LeapHandRepresentation(CLeapHandModelManager *parent, LeapHand *hand, eLeapHandType chirality,
-		LeapModelType type)
+	LeapHandRepresentation::LeapHandRepresentation(CLeapHandModelManager* parent, const LeapHand* leapHand,
+		LeapModelKind kind)
 	{
 		mParent = parent;
-		mHandID = hand->mId;
-		mChirality = chirality;
-		mType = type;
-		mMostRecentHand = hand;
+		mHandID = leapHand->mId;
+		mChirality = leapHand->mType;
+		mKind = kind;
+		mLeapHand = leapHand;
 	}
 
 	void LeapHandRepresentation::finish()
 	{
 		for (int i = 0; i < mHandModels.size(); i++)
 		{
-			mHandModels[i]->finish();
+			mHandModels[i]->finishHand();
 			mParent->returnToPool(mHandModels[i]);
 			mHandModels[i] = NULL;
 		}
 		mParent->removeHandRepresentation(this);
 	}
 
-	void LeapHandRepresentation::addModel(HLeapHandModelBase model)
+	void LeapHandRepresentation::registerModel(HLeapHandModelBase model)
 	{
 		mHandModels.push_back(model);
 		if (model->getLeapHand() == NULL)
 		{
-			model->setLeapHand(mMostRecentHand);
-			model->init();
+			model->setLeapHand(mLeapHand);
+			model->initHand();
 			model->begin();
-			model->update();
+			model->updateHand();
 		}
 		else
 		{
-			model->setLeapHand(mMostRecentHand);
+			model->setLeapHand(mLeapHand);
 			model->begin();
 		}
 	}
 
 	void LeapHandRepresentation::removeModel(HLeapHandModelBase model)
 	{
-		model->finish();
+		model->finishHand();
 		auto it = std::find(mHandModels.begin(), mHandModels.end(), model);
 		mHandModels.erase(it);
 	}
 
-	void LeapHandRepresentation::update(LeapHand *hand)
+	void LeapHandRepresentation::update(const LeapHand* leapHand)
 	{
-		mMostRecentHand = hand;
+		mLeapHand = leapHand;
 		for (int i = 0; i < mHandModels.size(); i++)
 		{
-			mHandModels[i]->setLeapHand(hand);
-			mHandModels[i]->update();
+			mHandModels[i]->setLeapHand(leapHand);
+			mHandModels[i]->updateHand();
 		}
 	}
 }

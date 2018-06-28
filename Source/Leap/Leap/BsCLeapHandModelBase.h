@@ -14,7 +14,7 @@ namespace bs
 	/**
 	 * Leap hand model type.
 	 */
-	enum class LeapModelType
+	enum class LeapModelKind
 	{
 		Graphics,
 		Physics,
@@ -31,16 +31,16 @@ namespace bs
 
 		bool getIsTracked() const { return mIsTracked; }
 
-		virtual eLeapHandType getChirality() const = 0;
+		virtual LeapModelKind getKind() const = 0;
 
-		virtual LeapModelType getType() const = 0;
+		virtual eLeapHandType getChirality() const = 0;
 
 		/**
 		 * Implement this function to initialise this hand after it is created.
 		 * This function is called by the HandModelManager during the Update()
 		 * phase when a new hand is detected by the Leap Motion device.
 		 */
-		virtual void init() {}
+		virtual void initHand() {}
 
 		virtual void begin();
 
@@ -51,9 +51,9 @@ namespace bs
 		 * HandModel instances in the physics hand list, the HandModelManager calls
 		 * this function in the FixedUpdate() phase.
 		 */
-		virtual void update() = 0;
+		virtual void updateHand() = 0;
 
-		virtual void finish();
+		virtual void finishHand();
 
 		/**
 		 * Returns the Leap Hand object represented by this HandModel.
@@ -61,14 +61,14 @@ namespace bs
 		 * Leap Hand object are relative to the Leap Motion coordinate system,
 		 * which uses a right-handed axes and units of millimeters.
 		 */
-		virtual LeapHand *getLeapHand() const = 0;
+		virtual const LeapHand* getLeapHand() const = 0;
 
 		/**
 		 * Assigns a Leap Hand object to this hand model.
 		 * Note that the Leap Hand objects are recreated every frame. The parent
 		 * HandController calls this method to set or update the underlying hand.
 		 */
-		virtual void setLeapHand(LeapHand *hand) = 0;
+		virtual void setLeapHand(const LeapHand* hand) = 0;
 
 		Event<void()> onBegin;
 		Event<void()> onFinish;

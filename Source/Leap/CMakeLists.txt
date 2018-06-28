@@ -1,22 +1,30 @@
 # Source files
 set(BS_LEAP_INC_COMPONENTS
 	"Leap/BsCLeapCapsuleHand.h"
+	"Leap/BsCLeapFingerModel.h"
 	"Leap/BsCLeapHandEnableDisable.h"
 	"Leap/BsCLeapHandModel.h"
 	"Leap/BsCLeapHandModelBase.h"
 	"Leap/BsCLeapHandModelManager.h"
-	"Leap/BsCLeapServiceProvider.h"
-	"Leap/BsCLeapSkeletalHand.h"
+	"Leap/BsCLeapRigidFinger.h"
 	"Leap/BsCLeapRigidHand.h"
+	"Leap/BsCLeapServiceProvider.h"
+	"Leap/BsCLeapSkeletalFinger.h"
+	"Leap/BsCLeapSkeletalHand.h"
 )
 
 set(BS_LEAP_INC_RTTI
 	"Private/RTTI/BsCLeapCapsuleHandRTTI.h"
+	"Private/RTTI/BsCLeapFingerModelRTTI.h"
 	"Private/RTTI/BsCLeapHandEnableDisableRTTI.h"
 	"Private/RTTI/BsCLeapHandModelRTTI.h"
 	"Private/RTTI/BsCLeapHandModelBaseRTTI.h"
 	"Private/RTTI/BsCLeapHandModelManagerRTTI.h"
+	"Private/RTTI/BsCLeapRigidFingerRTTI.h"
+	"Private/RTTI/BsCLeapRigidHandRTTI.h"
 	"Private/RTTI/BsCLeapServiceProviderRTTI.h"
+	"Private/RTTI/BsCLeapSkeletalFingerRTTI.h"
+	"Private/RTTI/BsCLeapSkeletalHandRTTI.h"
 )
 
 set(BS_LEAP_INC_UTILITY
@@ -35,11 +43,16 @@ set(BS_LEAP_INC_NOFILTER
 
 set(BS_LEAP_SRC_COMPONENTS
 	"Leap/BsCLeapCapsuleHand.cpp"
+	"Leap/BsCLeapFingerModel.cpp"
 	"Leap/BsCLeapHandEnableDisable.cpp"
 	"Leap/BsCLeapHandModel.cpp"
 	"Leap/BsCLeapHandModelBase.cpp"
 	"Leap/BsCLeapHandModelManager.cpp"
+	"Leap/BsCLeapRigidFinger.cpp"
+	"Leap/BsCLeapRigidHand.cpp"
 	"Leap/BsCLeapServiceProvider.cpp"
+	"Leap/BsCLeapSkeletalFinger.cpp"
+	"Leap/BsCLeapSkeletalHand.cpp"
 )
 
 set(BS_LEAP_SRC_NOFILTER

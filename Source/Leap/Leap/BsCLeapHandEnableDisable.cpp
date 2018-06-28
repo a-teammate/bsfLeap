@@ -10,14 +10,12 @@ namespace bs
 {
 	CLeapHandEnableDisable::CLeapHandEnableDisable()
 	{
-		setFlag(ComponentFlag::AlwaysRun, true);
 		setName("LeapHandEnableDisable");
 	}
 
 	CLeapHandEnableDisable::CLeapHandEnableDisable(const HSceneObject &parent)
 		: Component(parent)
 	{
-		setFlag(ComponentFlag::AlwaysRun, true);
 		setName("LeapHandEnableDisable");
 	}
 

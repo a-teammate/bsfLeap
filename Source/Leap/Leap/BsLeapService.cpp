@@ -141,7 +141,7 @@ namespace bs
 		return NULL;
 	}
 
-	SPtr<LeapDevice> LeapService::getDeviceByHandle(LeapDeviceHandle handle)
+	SPtr<LeapDevice> LeapService::getDeviceByHandle(LeapDeviceHandle handle) const
 	{
 		return findDeviceByHandle(handle);
 	}
@@ -271,7 +271,7 @@ namespace bs
 		return false;
 	}
 
-	SPtr<LeapDevice> LeapService::findDeviceByHandle(LeapDeviceHandle handle)
+	SPtr<LeapDevice> LeapService::findDeviceByHandle(LeapDeviceHandle handle) const
 	{
 		auto itFind = mDevices.find(handle);
 		if (itFind != mDevices.end())

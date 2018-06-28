@@ -2,7 +2,7 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "Leap/BsCLeapHandModel.h"
+#include "Leap/BsCLeapSkeletalFinger.h"
 
 namespace bs
 {
@@ -10,29 +10,15 @@ namespace bs
 	*  @{
 	*/
 
-	/**
-	* A hand object consisting of discrete, component parts.
-	*
-	* The hand can have game objects for the palm, wrist and forearm, as well as fingers.
-	*/
-	class CLeapSkeletalHand : public CLeapHandModel
+	/** A physics finger model for our rigid hand made out of various cube Unity Colliders. */
+	class CLeapRigidFinger : public CLeapSkeletalFinger
 	{
 	public:
-		CLeapSkeletalHand(const HSceneObject& parent);
+		CLeapRigidFinger(const HSceneObject &parent);
 
-	protected:
-		const float PALM_CENTER_OFFSET = 0.015f;
+		void updateFinger() override;
 
-
-	public:
-		/** Updates the hand and its component parts by setting their positions and
-		* rotations. */
-		void update() override;
-
-	protected:
-		Vector3 getPalmCenter();
-
-		void setPositions();
+		float filtering = 0.5f;
 
 		/************************************************************************/
 		/* 						COMPONENT OVERRIDES                      		*/
@@ -40,18 +26,18 @@ namespace bs
 	protected:
 		friend class SceneObject;
 
-		void start();
+		void onEnabled() override;
 
 		/************************************************************************/
 		/* 								RTTI		                     		*/
 		/************************************************************************/
 	public:
-		friend class ComponentRTTI;
+		friend class CLeapCapsuleHandRTTI;
 		static RTTITypeBase* getRTTIStatic();
 		RTTITypeBase* getRTTI() const override;
 
 	protected:
-		CLeapSkeletalHand(); // Serialization only
+		CLeapRigidFinger();// Serialization only
 	};
 
 	/** @} */

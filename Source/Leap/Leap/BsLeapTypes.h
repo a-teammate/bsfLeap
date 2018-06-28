@@ -17,6 +17,16 @@ namespace bs
 	/** Describes a bone's position and orientation. */
 	struct LeapBone
 	{
+		/** Enumerates the names of bones. */
+		enum Type
+		{
+			TYPE_METACARPAL = 0,
+			TYPE_PROXIMAL = 1,
+			TYPE_INTERMEDIATE = 2,
+			TYPE_DISTAL = 3,
+			TYPE_UNKNOWN = -1
+		};
+
 		/** The base of the bone, closer to the heart. The bones origin. */
 		Vector3 mPrevJoint;
 
@@ -33,6 +43,17 @@ namespace bs
 	/** Describes the digit of a hand. */
 	struct LeapFinger
 	{
+		/** Enumerates the names of the fingers. */
+		enum Type
+		{
+			TYPE_THUMB = 0,
+			TYPE_INDEX = 1,
+			TYPE_MIDDLE = 2,
+			TYPE_RING = 3,
+			TYPE_PINKY = 4,
+			TYPE_UNKNOWN = -1
+		};
+
 		/** The Leap identifier of this finger. */
 		INT32 mFingerId;
 

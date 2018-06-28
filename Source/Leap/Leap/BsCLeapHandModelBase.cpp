@@ -16,17 +16,17 @@ namespace bs
 
 	void CLeapHandModelBase::begin()
 	{
-		if (!onBegin.empty()) {
+		if (!onBegin.empty())
 			onBegin();
-		}
+
 		mIsTracked = true;
 	}
 
-	void CLeapHandModelBase::finish() {
+	void CLeapHandModelBase::finishHand()
+	{
 		if (!onFinish.empty())
-		{
 			onFinish();
-		}
+
 		mIsTracked = false;
 	}
 

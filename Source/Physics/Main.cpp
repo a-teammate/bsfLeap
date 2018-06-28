@@ -29,6 +29,7 @@
 #include "Leap/BsCLeapCapsuleHand.h"
 #include "Leap/BsCLeapHandEnableDisable.h"
 #include "Leap/BsCLeapHandModelManager.h"
+#include "Leap/BsCLeapRigidHand.h"
 #include "Leap/BsLeapService.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,16 +50,16 @@ namespace bs
 	UINT32 windowResWidth = 1280;
 	UINT32 windowResHeight = 720;
 
-	void setUpHand(HSceneObject handsSO, eLeapHandType chirality)
+	void setUpCapsuleHand(HSceneObject handsSO, eLeapHandType chirality)
 	{
 		String suffix = (chirality == eLeapHandType_Left) ? "_L" : "_R";
 
-		HSceneObject handGraphicsSO = SceneObject::create("GraphicsHands" + suffix);
+		HSceneObject handSO = SceneObject::create("CapsuleHand" + suffix);
 
-		HLeapCapsuleHand handModel = handGraphicsSO->addComponent<CLeapCapsuleHand>();
+		HLeapCapsuleHand handModel = handSO->addComponent<CLeapCapsuleHand>();
 		handModel->mChirality = chirality;
 
-		HLeapHandEnableDisable handTransition = handGraphicsSO->addComponent<CLeapHandEnableDisable>();
+		HLeapHandEnableDisable handTransition = handSO->addComponent<CLeapHandEnableDisable>();
 
 		HMesh sphereMesh = gBuiltinResources().getMesh(BuiltinMesh::Sphere);
 
@@ -67,7 +68,7 @@ namespace bs
 		HRenderable palmRenderable = palmSO->addComponent<CRenderable>();
 		palmRenderable->setMesh(sphereMesh);
 
-		palmSO->setParent(handGraphicsSO);
+		palmSO->setParent(handSO);
 
 		for (UINT32 i = 0; i < 5; ++i)
 		{
@@ -76,18 +77,54 @@ namespace bs
 			HRenderable fingerRenderable = fingerSO->addComponent<CRenderable>();
 			fingerRenderable->setMesh(sphereMesh);
 
-			fingerSO->setParent(handGraphicsSO);
+			fingerSO->setParent(handSO);
 		}
 
-		//handGraphicsSO->setActive(false);
+		//handSO->setActive(false);
 
-		handGraphicsSO->setParent(handsSO);
+		handSO->setParent(handsSO);
 
 		//HSceneObject handPhysicsSO = SceneObject::create("HandPhysics" + suffix);
 		//handPhysicsSO->addComponent<CLeapHandEnableDisable>();
 
 		//handPhysicsSO->setParent(handsSO);
 	}
+
+	void setUpRigidHand(HSceneObject handsSO, eLeapHandType chirality)
+	{
+		String suffix = (chirality == eLeapHandType_Left) ? "_L" : "_R";
+
+		HSceneObject handSO = SceneObject::create("RigidHand" + suffix);
+
+		HLeapCapsuleHand handModel = handSO->addComponent<CLeapRigidHand>();
+		handModel->mChirality = chirality;
+
+		HLeapHandEnableDisable handTransition = handSO->addComponent<CLeapHandEnableDisable>();
+
+		HMesh sphereMesh = gBuiltinResources().getMesh(BuiltinMesh::Sphere);
+
+		HSceneObject palmSO = SceneObject::create("palm" + suffix);
+
+		HRenderable palmRenderable = palmSO->addComponent<CRenderable>();
+		palmRenderable->setMesh(sphereMesh);
+
+		palmSO->setParent(handSO);
+
+		for (UINT32 i = 0; i < 5; ++i)
+		{
+			HSceneObject fingerSO = SceneObject::create("finger" + i + suffix);
+
+			HRenderable fingerRenderable = fingerSO->addComponent<CRenderable>();
+			fingerRenderable->setMesh(sphereMesh);
+
+			fingerSO->setParent(handSO);
+		}
+
+		//handSO->setActive(false);
+
+		handSO->setParent(handsSO);
+	}
+
 
 	/** Set up the scene used by the example, and the camera to view the world through. */
 	void setUpScene()
@@ -366,14 +403,25 @@ namespace bs
 
 		HLeapHandModelManager handModels = handsSO->addComponent<CLeapHandModelManager>();
 
-		setUpHand(handsSO, eLeapHandType_Left);
-		setUpHand(handsSO, eLeapHandType_Right);
+		setUpCapsuleHand(handsSO, eLeapHandType_Left);
+		setUpCapsuleHand(handsSO, eLeapHandType_Right);
 
-		HSceneObject graphicsL = handsSO->findChild("GraphicsHands_L");
-		HSceneObject graphicsR = handsSO->findChild("GraphicsHands_R");
+		HSceneObject capsuleL = handsSO->findChild("CapsuleHand_L");
+		HSceneObject capsuleR = handsSO->findChild("CapsuleHand_R");
 
-		handModels->addNewGroup("GraphicsHands", graphicsL->getComponent<CLeapCapsuleHand>(),
-			graphicsR->getComponent<CLeapCapsuleHand>());
+		handModels->addNewGroup("Capsule",
+			capsuleL->getComponent<CLeapCapsuleHand>(),
+			capsuleR->getComponent<CLeapCapsuleHand>());
+
+		setUpRigidHand(handsSO, eLeapHandType_Left);
+		setUpRigidHand(handsSO, eLeapHandType_Right);
+
+		HSceneObject rigidL = handsSO->findChild("RigidHand_L");
+		HSceneObject rigidR = handsSO->findChild("RigidHand_R");
+
+		handModels->addNewGroup("Rigid",
+			rigidL->getComponent<CLeapRigidHand>(),
+			rigidR->getComponent<CLeapRigidHand>());
 	}
 }
 

@@ -20,14 +20,8 @@ namespace bs
 	{
 	public:
 		/** Leap device constructor. */
-		void set(LeapDeviceHandle deviceHandle,
-				float horizontalViewAngle,
-				float verticalViewAngle,
-				float range,
-				float baseline,
-				eLeapDevicePID type,
-				bool isStreaming,
-				String serialNumber)
+		void set(LeapDeviceHandle deviceHandle, float horizontalViewAngle, float verticalViewAngle, float range,
+			float baseline, eLeapDevicePID type, bool isStreaming, String serialNumber)
 		{
 			mHandle = deviceHandle;
 			mHorizontalViewAngle = horizontalViewAngle;

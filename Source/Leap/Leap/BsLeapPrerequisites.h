@@ -50,13 +50,17 @@ namespace bs
 	typedef void* LeapDeviceHandle;
 
 	class CLeapCapsuleHand;
+	class CLeapFingerModel;
 	class CLeapHandEnableDisable;
 	class CLeapHandModel;
 	class CLeapHandModelBase;
 	class CLeapHandModelManager;
+	class CLeapRigidFinger;
+	class CLeapRigidHand;
 	class CLeapServiceProvider;
+	class CLeapSkeletalFinger;
+	class CLeapSkeletalHand;
 }
-
 
 namespace bs
 {
@@ -85,12 +89,17 @@ namespace bs
 namespace bs
 {
 	enum TypeID_Leap {
-		TID_CLeapHandEnableDisable = 81001,
-		TID_CLeapHandModel = 81002,
-		TID_CLeapHandModelBase = 81003,
-		TID_CLeapHandModelManager = 81004,
-		TID_CLeapServiceProvider = 81005,
-		TID_CLeapCapsuleHand = 81006
+		TID_CLeapCapsuleHand = 81000,
+		TID_CLeapFingerModel,
+		TID_CLeapHandEnableDisable,
+		TID_CLeapHandModel,
+		TID_CLeapHandModelBase,
+		TID_CLeapHandModelManager,
+		TID_CLeapRigidFinger,
+		TID_CLeapRigidHand,
+		TID_CLeapServiceProvider,
+		TID_CLeapSkeletalFinger,
+		TID_CLeapSkeletalHand,
 	};
 }
 
@@ -102,11 +111,16 @@ namespace bs
 
 	// Game object handles
 	typedef GameObjectHandle<CLeapCapsuleHand> HLeapCapsuleHand;
+	typedef GameObjectHandle<CLeapFingerModel> HLeapFingerModel;
 	typedef GameObjectHandle<CLeapHandEnableDisable> HLeapHandEnableDisable;
 	typedef GameObjectHandle<CLeapHandModel> HLeapHandModel;
 	typedef GameObjectHandle<CLeapHandModelBase> HLeapHandModelBase;
 	typedef GameObjectHandle<CLeapHandModelManager> HLeapHandModelManager;
+	typedef GameObjectHandle<CLeapRigidFinger> HLeapRigidFinger;
+	typedef GameObjectHandle<CLeapRigidHand> HLeapRigidHand;
 	typedef GameObjectHandle<CLeapServiceProvider> HLeapServiceProvider;
+	typedef GameObjectHandle<CLeapSkeletalFinger> HLeapSkeletalFinger;
+	typedef GameObjectHandle<CLeapSkeletalHand> HLeapSkeletalHand;
 
 	/** @} */
 }
