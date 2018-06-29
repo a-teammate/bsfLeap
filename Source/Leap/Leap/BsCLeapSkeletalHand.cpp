@@ -30,7 +30,7 @@ namespace bs
 		}
 	}
 
-	void CLeapSkeletalHand::update()
+	void CLeapSkeletalHand::updateHand()
 	{
 		setPositions();
 	}
@@ -51,20 +51,20 @@ namespace bs
 
 		if (mPalm != NULL)
 		{
-			mPalm->setPosition(getPalmCenter());
-			mPalm->setRotation(getPalmRotation());
+			mPalm->setWorldPosition(getPalmCenter());
+			//mPalm->setRotation(getPalmRotation());
 		}
 
 		if (mWristJoint != NULL)
 		{
-			mWristJoint->setPosition(getWristPosition());
-			mWristJoint->setRotation(getPalmRotation());
+			mWristJoint->setWorldPosition(getWristPosition());
+			//mWristJoint->setRotation(getPalmRotation());
 		}
 
 		if (mForearm != NULL)
 		{
-			mForearm->setPosition(getArmCenter());
-			mForearm->setRotation(getArmRotation());
+			mForearm->setWorldPosition(getArmCenter());
+			//mForearm->setRotation(getArmRotation());
 		}
 	}
 

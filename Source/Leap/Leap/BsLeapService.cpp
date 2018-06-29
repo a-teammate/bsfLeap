@@ -2,7 +2,7 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 
 #include "Leap/BsLeapService.h"
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 
 #include <stdio.h>
 #include <stdlib.h>

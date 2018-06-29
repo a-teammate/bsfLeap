@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Math/BsRay.h"
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 #include "Scene/BsSceneObject.h"
 
 namespace bs

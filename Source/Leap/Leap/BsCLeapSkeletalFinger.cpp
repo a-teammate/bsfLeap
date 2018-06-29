@@ -37,8 +37,8 @@ namespace bs
 		{
 			if (mBones[i] != NULL)
 			{
-				mBones[i]->setPosition(getBoneCenter(i));
-				mBones[i]->setRotation(getBoneRotation(i));
+				mBones[i]->setWorldPosition(getBoneCenter(i));
+				//mBones[i]->setRotation(getBoneRotation(i));
 			}
 		}
 
@@ -46,8 +46,8 @@ namespace bs
 		{
 			if (mJoints[i] != NULL)
 			{
-				mJoints[i]->setPosition(getJointPosition(i + 1));
-				mJoints[i]->setRotation(getBoneRotation(i + 1));
+				mJoints[i]->setWorldPosition(getJointPosition(i + 1));
+				//mJoints[i]->setRotation(getBoneRotation(i + 1));
 			}
 		}
 	}

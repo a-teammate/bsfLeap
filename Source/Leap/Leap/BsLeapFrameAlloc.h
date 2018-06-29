@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Leap/BsLeapPrerequisites.h"
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 
 namespace bs
 {
@@ -14,30 +14,40 @@ namespace bs
 	 /**
 	 * Class representing a memory buffer used when copying LeapFrame from LeapC.
 	 */
-	template <typename A = StdAlloc<uint8_t>>
+	template <typename A = StdAlloc<UINT8>>
 	class LeapFrameAllocT
 	{
 	public:
-		/** Returns the frame. */
+		LeapFrameAllocT() = default;
+		LeapFrameAllocT(const LeapFrameAllocT&) = delete;
+
+		/** Returns the LeapFrame. */
 		const LeapFrame* get() const;
 
-		/** Returns the frame. */
+		/** Returns the LeapFrame. */
 		LeapFrame* get();
 
+		/** Updates the LeapFrame data with the provided LEAP_TRACKING_EVENT. */
 		void copyFrom(const LEAP_TRACKING_EVENT* trackingEvent);
 
 		/** Allocates memory needed to save the LeapFrame data. */
 		void resize(size_t size);
 
 		/** Allocates memory needed to save the LeapFrame data. */
-		void resizeNumberOfHands(uint32_t nHands);
+		void resizeNumberOfHands(UINT32 nHands);
+
+		/** Copy assignment. */
+		LeapFrameAllocT& operator=(const LeapFrameAllocT& other);
+
+		/** Copy assignment. */
+		void _copy(const LeapFrameAllocT& other);
 
 		/** Returns the number of bytes needed to allocate a LeapFrame data. */
-		static size_t sizeBytesNumberOfHands(uint32_t nHands);
+		size_t _sizeBytesNumberOfHands(UINT32 nHands) const;
 
 	private:
-		/** Memory buffer for saving LEAP_TRACKING_EVENT data returned from LeapC */
-		Vector<uint8_t, A> mAlloc;
+		/** Memory buffer for saving LeapFrame data. */
+		Vector<UINT8, A> mAlloc;
 	};
 
 	/** LeapFrameAlloc with default allocator. */

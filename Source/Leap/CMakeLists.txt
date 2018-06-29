@@ -34,11 +34,12 @@ set(BS_LEAP_INC_UTILITY
 
 set(BS_LEAP_INC_NOFILTER
 	"Leap/BsLeapDevice.h"
+	"Leap/BsLeapFrame.h"
 	"Leap/BsLeapFrameAlloc.h"
+	"Leap/BsLeapFrameUtility.h"
 	"Leap/BsLeapHandRepresentation.h"
 	"Leap/BsLeapPrerequisites.h"
 	"Leap/BsLeapService.h"
-	"Leap/BsLeapTypes.h"
 )
 
 set(BS_LEAP_SRC_COMPONENTS
@@ -57,6 +58,7 @@ set(BS_LEAP_SRC_COMPONENTS
 
 set(BS_LEAP_SRC_NOFILTER
 	"Leap/BsLeapFrameAlloc.cpp"
+	"Leap/BsLeapFrameUtility.cpp"
 	"Leap/BsLeapHandRepresentation.cpp"
 	"Leap/BsLeapService.cpp"
 )

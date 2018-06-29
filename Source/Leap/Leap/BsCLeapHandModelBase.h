@@ -2,7 +2,7 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 #pragma once
 
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 #include "Scene/BsComponent.h"
 
 namespace bs
@@ -26,13 +26,14 @@ namespace bs
 	class CLeapHandModelBase : public Component
 	{
 	public:
-		/** Construct CLeapCapsuleHand. */
 		CLeapHandModelBase(const HSceneObject &parent);
 
 		bool getIsTracked() const { return mIsTracked; }
 
+		/** Identifies the kind of representation or this hand. */
 		virtual LeapModelKind getKind() const = 0;
 
+		/** Identifies the chirality of this hand. */
 		virtual eLeapHandType getChirality() const = 0;
 
 		/**

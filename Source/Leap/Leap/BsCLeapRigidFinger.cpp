@@ -35,28 +35,29 @@ namespace bs
 			if (mBones[i] != NULL)
 			{
 				// Set bone dimensions.
-				HCapsuleCollider capsule = mBones[i]->getComponent<CCapsuleCollider>();
-				if (capsule != NULL)
-				{
-					Vector3 scale = SO()->getTransform().getScale();
-					// Initialization
-					//mBones[i]->localScale = new Vector3(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+				//HCapsuleCollider capsule = mBones[i]->getComponent<CCapsuleCollider>();
+				//if (capsule != NULL)
+				//{
+				//	Vector3 scale = SO()->getTransform().getScale();
+				//	// Initialization
+				//	//mBones[i]->localScale = new Vector3(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+				//
+				//	// Update
+				//	capsule->setRadius(getBoneWidth(i) * 0.5f);
+				//	capsule->setHalfHeight((getBoneLength(i) + getBoneWidth(i)) * 0.5f);
+				//}
 
-					// Update
-					capsule->setRadius(getBoneWidth(i) * 0.5f);
-					capsule->setHalfHeight((getBoneLength(i) + getBoneWidth(i)) * 0.5f);
-				}
-
-				HRigidbody boneBody = mBones[i]->getComponent<CRigidbody>();
-				if (boneBody)
+				//HRigidbody boneBody = mBones[i]->getComponent<CRigidbody>();
+				//if (boneBody)
+				//{
+				//	boneBody->move(getBoneCenter(i));
+				//	//boneBody->rotate(getBoneRotation(i));
+				//}
+				//else
 				{
-					boneBody->move(getBoneCenter(i));
-					boneBody->rotate(getBoneRotation(i));
-				}
-				else
-				{
-					mBones[i]->setPosition(getBoneCenter(i));
-					mBones[i]->setRotation(getBoneRotation(i));
+					//mBones[i]->setWorldPosition(getBoneCenter(i));
+					mBones[i]->setWorldPosition(mFinger->mBones[mType].mNextJoint);
+					//mBones[i]->setRotation(getBoneRotation(i));
 				}
 			}
 		}

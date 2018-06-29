@@ -84,6 +84,11 @@ namespace bs
 		return Vector3::ZERO;
 	}
 
+	float CLeapHandModel::getArmLength()
+	{
+		return (mHand->mArm.mNextJoint - mHand->mArm.mPrevJoint).length();
+	}
+
 	Vector3 CLeapHandModel::getElbowPosition()
 	{
 		if (mHand != NULL)
@@ -125,9 +130,9 @@ namespace bs
 		mHand = hand;
 		for (int i = 0; i < NUM_FINGERS; ++i)
 		{
-			// if (mFingers[i] != NULL) {
-			//  mFingers[i].SetLeapHand(mHand);
-			//}
+			if (mFingers[i] != NULL) {
+				mFingers[i]->setLeapHand(mHand);
+			}
 		}
 	}
 
@@ -135,10 +140,10 @@ namespace bs
 	{
 		for (int f = 0; f < NUM_FINGERS; ++f)
 		{
-			// if (mFingers[f] != NULL) {
-			//  mFingers[f].fingerType = (Finger.FingerType)f;
-			//  mFingers[f].InitFinger();
-			//}
+			if (mFingers[f] != NULL) {
+				mFingers[f]->mType = (LeapFinger::Type)f;
+				mFingers[f]->initFinger();
+			}
 		}
 	}
 

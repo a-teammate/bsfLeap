@@ -276,7 +276,6 @@ namespace bs
 					auto it = mModelToHandRepMapping.find(model.get());
 					if (it == mModelToHandRepMapping.end())
 					{
-						// model->group = group;
 						mModelToHandRepMapping[model.get()] = handRep;
 					}
 				}

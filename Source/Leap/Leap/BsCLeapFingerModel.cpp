@@ -14,7 +14,7 @@ namespace bs
 	}
 
 	CLeapFingerModel::CLeapFingerModel(const HSceneObject& parent)
-		: CLeapFingerModel(parent)
+		: Component(parent)
 	{
 		setName("LeapFingerModel");
 

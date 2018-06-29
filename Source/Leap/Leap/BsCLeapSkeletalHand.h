@@ -13,7 +13,7 @@ namespace bs
 	/**
 	* A hand object consisting of discrete, component parts.
 	*
-	* The hand can have game objects for the palm, wrist and forearm, as well as fingers.
+	* The hand can have scene objects for the palm, wrist and forearm, as well as fingers.
 	*/
 	class CLeapSkeletalHand : public CLeapHandModel
 	{
@@ -25,9 +25,8 @@ namespace bs
 
 
 	public:
-		/** Updates the hand and its component parts by setting their positions and
-		* rotations. */
-		void update() override;
+		/** Updates the hand and its component parts by setting their positions and rotations. */
+		void updateHand() override;
 
 	protected:
 		Vector3 getPalmCenter();

@@ -2,7 +2,6 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ********** *//
 #pragma once
 
-#include "Leap/BsLeapTypes.h"
 #include "Leap/BsLeapService.h"
 #include "Scene/BsComponent.h"
 #include "Utility/BsSmoothedFloat.h"
@@ -113,11 +112,11 @@ namespace bs
 
 		float calculatePhysicsExtrapolation();
 
-		void transformFrame(const LeapFrame* source, LeapFrame* dest);
-
 		void handleUpdateFrameEvent(LeapFrame* frame);
 
 		void handleFixedFrameEvent(LeapFrame* frame);
+
+		void _transformFrame(const LeapFrameAlloc& source, LeapFrameAlloc& dest);
 
 	private:
 		void onDeviceInit(const LEAP_DEVICE_EVENT *device_event);
@@ -125,9 +124,6 @@ namespace bs
 		void triggerOnDeviceSafe(const LEAP_DEVICE_EVENT *device_event);
 
 	protected:
-		/** The transform array used for late-latching. */
-		const String HAND_ARRAY_GLOBAL_NAME = "_LeapHandTransforms";
-
 		/** The maximum number of times the provider will attempt to reconnect to the service. */
 		const int MAX_RECONNECTION_ATTEMPTS = 5;
 

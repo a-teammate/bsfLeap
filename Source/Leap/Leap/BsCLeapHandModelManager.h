@@ -4,7 +4,7 @@
 
 #include "Leap/BsCLeapHandModel.h"
 #include "Leap/BsCLeapServiceProvider.h"
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 #include "Scene/BsComponent.h"
 
 namespace bs

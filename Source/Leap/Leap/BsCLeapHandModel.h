@@ -27,6 +27,7 @@ namespace bs
 	public:
 		CLeapHandModel(const HSceneObject& parent);
 
+		/** @copydoc CLeapHandModelBase::getChirality */
 		eLeapHandType getChirality() const override { return mChirality; }
 
 		/** @copydoc CLeapHandModelBase::getKind */
@@ -51,10 +52,7 @@ namespace bs
 		Vector3 getArmCenter();
 
 		/** Returns the measured length of the forearm in meters.*/
-		float getArmLength()
-		{
-			return (mHand->mArm.mNextJoint - mHand->mArm.mPrevJoint).length();
-		}
+		float getArmLength();
 
 		/** Returns the measured width of the forearm in meters.*/
 		float getArmWidth() { return mHand->mArm.mWidth; }
@@ -106,7 +104,7 @@ namespace bs
 
 	protected:
 		/** The LeapHand object this hand model represents. */
-		const LeapHand* mHand;
+		const LeapHand* mHand = NULL;
 
 	private:
 		LeapModelKind mKind;

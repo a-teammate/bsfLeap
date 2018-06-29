@@ -21,14 +21,14 @@ namespace bs
 	void LeapFrameAllocT<A>::copyFrom(const LEAP_TRACKING_EVENT* trackingEvent)
 	{
 		resizeNumberOfHands(trackingEvent->nHands);
-		uint8_t* data = mAlloc.data();
+		UINT8* data = mAlloc.data();
 		
 		std::memcpy(data, trackingEvent, sizeof(LeapFrame));
 
 		data += sizeof(LeapFrame);
 		get()->mHands = reinterpret_cast<LeapHand*>(data);
 
-		for (uint32_t i = 0; i < trackingEvent->nHands; ++i)
+		for (UINT32 i = 0; i < trackingEvent->nHands; ++i)
 		{
 			std::memcpy(data, trackingEvent->pHands + i, sizeof(LeapHand));
 			data += sizeof(LeapHand);
@@ -43,16 +43,31 @@ namespace bs
 	}
 
 	template <typename A>
-	void LeapFrameAllocT<A>::resizeNumberOfHands(uint32_t nHands)
+	void LeapFrameAllocT<A>::resizeNumberOfHands(UINT32 nHands)
 	{
-		resize(sizeBytesNumberOfHands(nHands));
+		resize(_sizeBytesNumberOfHands(nHands));
 	}
 
 	template <typename A>
-	size_t LeapFrameAllocT<A>::sizeBytesNumberOfHands(uint32_t nHands)
+	LeapFrameAllocT<A>& LeapFrameAllocT<A>::operator=(const LeapFrameAllocT& other)
+	{
+		if (this != &other)
+			this->_copy(other);
+
+		return *this;
+	}
+
+	template <typename A>
+	void LeapFrameAllocT<A>::_copy(const LeapFrameAllocT& other)
+	{
+		copyFrom(reinterpret_cast<const LEAP_TRACKING_EVENT*>(other.get()));
+	}
+
+	template <typename A>
+	size_t LeapFrameAllocT<A>::_sizeBytesNumberOfHands(UINT32 nHands) const
 	{
 		return sizeof(LeapFrame) + nHands * sizeof(LeapHand);
 	}
 
-	template class LeapFrameAllocT<StdAlloc<uint8_t>>;
+	template class LeapFrameAllocT<StdAlloc<UINT8>>;
 }

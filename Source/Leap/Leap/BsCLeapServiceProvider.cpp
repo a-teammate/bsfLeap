@@ -2,13 +2,14 @@
 //*********** Licensed under the MIT license. See LICENSE.md for full terms. This notice is not to be removed. ***********//
 
 #include "Leap/BsCLeapServiceProvider.h"
-#include "Leap/BsLeapTypes.h"
-#include "Leap/BsLeapService.h"
+#include "Leap/BsLeapFrameUtility.h"
 #include "Private/RTTI/BsCLeapServiceProviderRTTI.h"
-#include "BsCoreApplication.h"
 #include "Utility/BsTime.h"
 
 using namespace std::placeholders;
+
+/** Converts millimeters to meters. */
+static constexpr double MM_TO_M = 1e-3;
 
 /** Converts nanoseconds to seconds. */
 static constexpr double NS_TO_S = 1e-6;
@@ -24,7 +25,7 @@ namespace bs
 		setFlag(ComponentFlag::AlwaysRun, true);
 	}
 
-	CLeapServiceProvider::CLeapServiceProvider(const HSceneObject &parent)
+	CLeapServiceProvider::CLeapServiceProvider(const HSceneObject& parent)
 		: Component(parent)
 	{
 		setName("LeapServiceProvider");
@@ -59,7 +60,7 @@ namespace bs
 		case PhysicsExtrapolationNone:
 			return 0;
 		case PhysicsExtrapolationAuto:
-			return gCoreApplication().getFixedUpdateStep();
+			return gTime().getFrameDelta();
 		case PhysicsExtrapolationManual:
 			return mPhysicsExtrapolationTime;
 		default:
@@ -69,8 +70,8 @@ namespace bs
 
 	void CLeapServiceProvider::retransformFrames()
 	{
-		transformFrame(mUntransformedUpdateFrame.get(), mTransformedUpdateFrame.get());
-		transformFrame(mUntransformedFixedFrame.get(), mTransformedFixedFrame.get());
+		_transformFrame(mUntransformedUpdateFrame, mTransformedUpdateFrame);
+		_transformFrame(mUntransformedFixedFrame, mTransformedFixedFrame);
 	}
 
 	HEvent CLeapServiceProvider::onDeviceSafeConnect(std::function<void(SPtr<LeapDevice>)> func)
@@ -153,6 +154,14 @@ namespace bs
 		return false;
 	}
 
+	int64_t CLeapServiceProvider::calculateInterpolationTime()
+	{
+		if (mLeap != NULL)
+			return mLeap->getNow() - (uint64_t)mSmoothedTrackingLatency.mValue;
+		else
+			return 0;
+	}
+
 	void CLeapServiceProvider::handleUpdateFrameEvent(LeapFrame* frame)
 	{
 		if (!onUpdateFrame.empty())
@@ -165,32 +174,24 @@ namespace bs
 			onFixedFrame(frame);
 	}
 
-	int64_t CLeapServiceProvider::calculateInterpolationTime()
+	void CLeapServiceProvider::_transformFrame(const LeapFrameAlloc& source, LeapFrameAlloc& dest)
 	{
-		if (mLeap != NULL)
-			return mLeap->getNow() - (uint64_t)mSmoothedTrackingLatency.mValue;
-		else
-			return 0;
+		dest = source;
+		LeapFrameUtility::transform(dest.get(), SO()->getTransform());
 	}
 
-	void CLeapServiceProvider::transformFrame(const LeapFrame* source, LeapFrame* dest)
-	{
-		const Transform& transform = SO()->getTransform();
-		//dest->CopyFrom(source).Transform(transform.GetLeapMatrix());
-	}
-
-	void CLeapServiceProvider::onDeviceInit(const LEAP_DEVICE_EVENT *device_event)
+	void CLeapServiceProvider::onDeviceInit(const LEAP_DEVICE_EVENT* deviceEvent)
 	{
 		initializeFlags();
 
 		mOnDeviceInitConn.disconnect();
 	}
 
-	void CLeapServiceProvider::triggerOnDeviceSafe(const LEAP_DEVICE_EVENT *device_event)
+	void CLeapServiceProvider::triggerOnDeviceSafe(const LEAP_DEVICE_EVENT* deviceEvent)
 	{
 		if (!onDeviceSafe.empty())
 		{
-			SPtr<LeapDevice> device = mLeap->getDeviceByHandle(device_event->device.handle);
+			SPtr<LeapDevice> device = mLeap->getDeviceByHandle(deviceEvent->device.handle);
 			onDeviceSafe(device);
 		}
 	}
@@ -215,9 +216,9 @@ namespace bs
 			mSmoothedTrackingLatency.mValue = std::min(mSmoothedTrackingLatency.mValue, 30000.0f);
 			mSmoothedTrackingLatency.update(trackingLatency, gTime().getFrameDelta());
 
-			int64_t interpolationTime = calculateInterpolationTime();
-			int64_t timestamp = interpolationTime + (mExtrapolationAmount * 1000);
-			int64_t sourceTimestamp = interpolationTime - (mBounceAmount * 1000);
+			INT64 interpolationTime = calculateInterpolationTime();
+			INT64 timestamp = interpolationTime + (mExtrapolationAmount * 1000);
+			INT64 sourceTimestamp = interpolationTime - (mBounceAmount * 1000);
 
 			bool success = mLeap->getInterpolatedFrameFromTime(timestamp, sourceTimestamp, &mUntransformedUpdateFrame);
 			if (!success)
@@ -232,10 +233,9 @@ namespace bs
 
 		if (mUntransformedUpdateFrame.get() != NULL)
 		{
-			transformFrame(mUntransformedUpdateFrame.get(), mTransformedUpdateFrame.get());
+			_transformFrame(mUntransformedUpdateFrame, mTransformedUpdateFrame);
 
-			//handleUpdateFrameEvent(mTransformedUpdateFrame.get());
-			handleUpdateFrameEvent(mUntransformedUpdateFrame.get());
+			handleUpdateFrameEvent(mTransformedUpdateFrame.get());
 		}
 	}
 
@@ -260,8 +260,8 @@ namespace bs
 				// By default we use gCoreApplication().getFixedUpdateStep() to ensure that our hands are on the same
 				// timeline as Update.  We add an extrapolation value to help compensate
 				// for latency.
-				float extrapolatedTime = gCoreApplication().getLastFixedUpdateTime() + calculatePhysicsExtrapolation();
-				timestamp = (uint64_t)(extrapolatedTime * S_TO_NS) + mBsToLeapOffset;
+				float extrapolatedTime = gTime().getLastFixedUpdateTime() + calculatePhysicsExtrapolation();
+				timestamp = (UINT64)(extrapolatedTime * S_TO_NS) + mBsToLeapOffset;
 			} break;
 			case FrameOptimizationReusePhysicsForUpdate:
 			{
@@ -284,7 +284,7 @@ namespace bs
 
 		if (mUntransformedFixedFrame.get() != NULL)
 		{
-			transformFrame(mUntransformedFixedFrame.get(), mTransformedFixedFrame.get());
+			_transformFrame(mUntransformedFixedFrame, mTransformedFixedFrame);
 
 			handleFixedFrameEvent(mTransformedFixedFrame.get());
 		}

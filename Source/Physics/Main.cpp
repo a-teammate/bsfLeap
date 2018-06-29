@@ -1,13 +1,11 @@
 // Framework includes
 #include "BsApplication.h"
-#include "Resources/BsResources.h"
-#include "Resources/BsBuiltinResources.h"
-#include "Material/BsMaterial.h"
 #include "Components/BsCCamera.h"
 #include "Components/BsCRenderable.h"
 #include "Components/BsCSkybox.h"
 #include "Components/BsCPlaneCollider.h"
 #include "Components/BsCBoxCollider.h"
+#include "Components/BsCCapsuleCollider.h"
 #include "Components/BsCSphereCollider.h"
 #include "Components/BsCCharacterController.h"
 #include "Components/BsCRigidbody.h"
@@ -15,20 +13,27 @@
 #include "GUI/BsGUIPanel.h"
 #include "GUI/BsGUILayoutY.h"
 #include "GUI/BsGUILabel.h"
+#include "Input/BsInput.h"
+#include "Material/BsMaterial.h"
 #include "Physics/BsPhysicsMaterial.h"
+#include "Platform/BsCursor.h"
 #include "RenderAPI/BsRenderAPI.h"
 #include "RenderAPI/BsRenderWindow.h"
+#include "RenderAPI/BsVertexDataDesc.h"
+#include "Renderer/BsRendererMeshData.h"
+#include "Resources/BsResources.h"
+#include "Resources/BsBuiltinResources.h"
 #include "Scene/BsSceneObject.h"
-#include "Platform/BsCursor.h"
-#include "Input/BsInput.h"
+#include "Utility/BsShapeMeshes3D.h"
 
 // Example includes
 #include "BsExampleFramework.h"
-#include "BsFPSWalker.h"
 #include "BsFPSCamera.h"
+#include "BsFPSWalker.h"
 #include "Leap/BsCLeapCapsuleHand.h"
 #include "Leap/BsCLeapHandEnableDisable.h"
 #include "Leap/BsCLeapHandModelManager.h"
+#include "Leap/BsCLeapRigidFinger.h"
 #include "Leap/BsCLeapRigidHand.h"
 #include "Leap/BsLeapService.h"
 
@@ -47,8 +52,56 @@ namespace bs
 {
 	constexpr float GROUND_PLANE_SCALE = 50.0f;
 
+	constexpr float HAND_SPHERE_RADIUS = 0.1f;
+
 	UINT32 windowResWidth = 1280;
 	UINT32 windowResHeight = 720;
+
+	Vector3 leapProviderPos(0.0f, 0.0f, 1.0f);
+	Vector3 leapProviderScl(0.01f, 0.01f, 0.01f);
+
+	struct HandAssets
+	{
+		HMesh sphereMesh;
+		HMesh cylinderMesh;
+	};
+
+	HandAssets assets;
+
+	/** Load the resources we'll be using throughout the example. */
+	void loadHandAssets()
+	{
+		// Generate 3D sphere model
+
+		SPtr<VertexDataDesc> vertexDesc = bs_shared_ptr_new<VertexDataDesc>();
+		vertexDesc->addVertElem(VET_FLOAT3, VES_POSITION);
+		vertexDesc->addVertElem(VET_FLOAT2, VES_TEXCOORD);
+		vertexDesc->addVertElem(VET_FLOAT3, VES_NORMAL);
+		vertexDesc->addVertElem(VET_FLOAT4, VES_TANGENT);
+		vertexDesc->addVertElem(VET_COLOR, VES_COLOR);
+
+		UINT32 sphereNumVertices = 0;
+		UINT32 sphereNumIndices = 0;
+		ShapeMeshes3D::getNumElementsSphere(3, sphereNumVertices, sphereNumIndices);
+		SPtr<MeshData> sphereMeshData = bs_shared_ptr_new<MeshData>(sphereNumVertices, sphereNumIndices, vertexDesc);
+
+		ShapeMeshes3D::solidSphere(Sphere(Vector3::ZERO, HAND_SPHERE_RADIUS), sphereMeshData, 0, 0, 3);
+
+		assets.sphereMesh = Mesh::create(sphereNumVertices, sphereNumIndices, vertexDesc);
+		assets.sphereMesh->writeData(sphereMeshData, true);
+
+		// Generate 3D cylinder model
+
+		UINT32 cylinderNumVertices = 0;
+		UINT32 cylinderNumIndices = 0;
+		ShapeMeshes3D::getNumElementsCylinder(3, cylinderNumVertices, cylinderNumIndices);
+		SPtr<MeshData> cylinderMeshData = bs_shared_ptr_new<MeshData>(cylinderNumVertices, cylinderNumIndices, vertexDesc);
+
+		ShapeMeshes3D::solidCylinder(Vector3::ZERO, Vector3::UNIT_X, 0.3f, 0.1f, Vector2(1.0f, 1.0f), cylinderMeshData, 0, 0, 3);
+
+		assets.cylinderMesh = Mesh::create(cylinderNumVertices, cylinderNumIndices, vertexDesc);
+		assets.cylinderMesh->writeData(cylinderMeshData, true);
+	}
 
 	void setUpCapsuleHand(HSceneObject handsSO, eLeapHandType chirality)
 	{
@@ -61,33 +114,36 @@ namespace bs
 
 		HLeapHandEnableDisable handTransition = handSO->addComponent<CLeapHandEnableDisable>();
 
-		HMesh sphereMesh = gBuiltinResources().getMesh(BuiltinMesh::Sphere);
-
-		HSceneObject palmSO = SceneObject::create("palm" + suffix);
+		HSceneObject palmSO = SceneObject::create("palm");
 
 		HRenderable palmRenderable = palmSO->addComponent<CRenderable>();
-		palmRenderable->setMesh(sphereMesh);
+		palmRenderable->setMesh(assets.sphereMesh);
 
 		palmSO->setParent(handSO);
 
-		for (UINT32 i = 0; i < 5; ++i)
+		for (UINT32 f = 0; f < 5; ++f)
 		{
-			HSceneObject fingerSO = SceneObject::create("finger" + i + suffix);
+			HSceneObject fingerSO = SceneObject::create("finger" + toString(f));
 
 			HRenderable fingerRenderable = fingerSO->addComponent<CRenderable>();
-			fingerRenderable->setMesh(sphereMesh);
+			fingerRenderable->setMesh(assets.sphereMesh);
 
 			fingerSO->setParent(handSO);
-		}
 
-		//handSO->setActive(false);
+			for (UINT32 b = 0; b < 3; ++b)
+			{
+				HSceneObject boneSO = SceneObject::create("bone" + toString(b));
+
+				HRenderable boneRenderable = boneSO->addComponent<CRenderable>();
+				boneRenderable->setMesh(assets.sphereMesh);
+
+				boneSO->setParent(fingerSO);
+			}
+		}
 
 		handSO->setParent(handsSO);
 
-		//HSceneObject handPhysicsSO = SceneObject::create("HandPhysics" + suffix);
-		//handPhysicsSO->addComponent<CLeapHandEnableDisable>();
-
-		//handPhysicsSO->setParent(handsSO);
+		//handSO->setActive(false);
 	}
 
 	void setUpRigidHand(HSceneObject handsSO, eLeapHandType chirality)
@@ -96,35 +152,48 @@ namespace bs
 
 		HSceneObject handSO = SceneObject::create("RigidHand" + suffix);
 
-		HLeapCapsuleHand handModel = handSO->addComponent<CLeapRigidHand>();
+		HLeapRigidHand handModel = handSO->addComponent<CLeapRigidHand>();
 		handModel->mChirality = chirality;
 
 		HLeapHandEnableDisable handTransition = handSO->addComponent<CLeapHandEnableDisable>();
 
-		HMesh sphereMesh = gBuiltinResources().getMesh(BuiltinMesh::Sphere);
-
-		HSceneObject palmSO = SceneObject::create("palm" + suffix);
-
-		HRenderable palmRenderable = palmSO->addComponent<CRenderable>();
-		palmRenderable->setMesh(sphereMesh);
+		HSceneObject palmSO = SceneObject::create("palm");
 
 		palmSO->setParent(handSO);
 
-		for (UINT32 i = 0; i < 5; ++i)
+		for (UINT32 f = 0; f < 5; ++f)
 		{
-			HSceneObject fingerSO = SceneObject::create("finger" + i + suffix);
+			HSceneObject fingerSO = SceneObject::create("finger" + toString(f));
 
-			HRenderable fingerRenderable = fingerSO->addComponent<CRenderable>();
-			fingerRenderable->setMesh(sphereMesh);
+			HLeapRigidFinger fingerModel = handSO->addComponent<CLeapRigidFinger>();
+
+			handModel->mFingers[f] = fingerModel;
 
 			fingerSO->setParent(handSO);
+
+			for (UINT32 b = 0; b < 3; ++b)
+			{
+				HSceneObject boneSO = SceneObject::create("bone" + toString(b));
+
+				fingerModel->mBones[b] = boneSO;
+
+				HSphereCollider collider = boneSO->addComponent<CSphereCollider>();
+				collider->setRadius(HAND_SPHERE_RADIUS);
+				//collider->setHalfHeight(0.15f);
+				//collider->setCenter(Vector3(0.15f, 0.0f, 0.0f));
+
+				HRigidbody capsuleRigidbody = boneSO->addComponent<CRigidbody>();
+				capsuleRigidbody->setIsKinematic(true);
+				capsuleRigidbody->setMass(1e9f);
+
+				boneSO->setParent(fingerSO);
+			}
 		}
 
-		//handSO->setActive(false);
-
 		handSO->setParent(handsSO);
-	}
 
+		//handSO->setActive(false);
+	}
 
 	/** Set up the scene used by the example, and the camera to view the world through. */
 	void setUpScene()
@@ -395,7 +464,11 @@ namespace bs
 		/* 									HANDS	                     		*/
 		/************************************************************************/
 
+		loadHandAssets();
+
 		HSceneObject leapSO = SceneObject::create("LeapServiceProvider");
+		leapSO->setPosition(leapProviderPos);
+		leapSO->setScale(leapProviderScl);
 
 		leapSO->addComponent<CLeapServiceProvider>();
 

@@ -4,7 +4,7 @@
 
 #include "Leap/BsLeapDevice.h"
 #include "Leap/BsLeapFrameAlloc.h"
-#include "Leap/BsLeapTypes.h"
+#include "Leap/BsLeapFrame.h"
 #include "Utility/BsCircularBuffer.h"
 #include "Utility/BsEvent.h"
 #include "Utility/BsModule.h"

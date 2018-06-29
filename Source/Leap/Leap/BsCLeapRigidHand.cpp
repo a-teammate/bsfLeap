@@ -33,12 +33,12 @@ namespace bs
 			if (palmBody)
 			{
 				palmBody->move(getPalmCenter());
-				palmBody->rotate(getPalmRotation());
+				//palmBody->rotate(getPalmRotation());
 			}
 			else
 			{
-				mPalm->setPosition(getPalmCenter());
-				mPalm->setRotation(getPalmRotation());
+				mPalm->setWorldPosition(getPalmCenter());
+				//mPalm->setRotation(getPalmRotation());
 			}
 		}
 
@@ -61,12 +61,12 @@ namespace bs
 			if (forearmBody)
 			{
 				forearmBody->move(getArmCenter());
-				forearmBody->rotate(getArmRotation());
+				//forearmBody->rotate(getArmRotation());
 			}
 			else
 			{
-				mForearm->setPosition(getArmCenter());
-				mForearm->setRotation(getArmRotation());
+				mForearm->setWorldPosition(getArmCenter());
+				//mForearm->setRotation(getArmRotation());
 			}
 		}
 	}
