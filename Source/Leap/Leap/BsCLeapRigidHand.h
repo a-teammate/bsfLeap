@@ -23,7 +23,8 @@ namespace bs
 
 		bool supportsEditorPersistence() { return true; }
 
-		void updateHand() override;
+		/** @copydoc CLeapHandModelBase::updateFrame */
+		void updateFrame() override;
 
 		/************************************************************************/
 		/* 						COMPONENT OVERRIDES                      		*/

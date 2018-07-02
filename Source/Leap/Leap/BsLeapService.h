@@ -16,20 +16,18 @@ namespace bs
 	 */
 
 	/**
-	 * The LeapService module is your main interface to the Leap Motion Controller.
+	 * The LeapService module is your main interface to the Leap Motion software.
 	 *
-	 * Create an instance of this Controller class to access frames of tracking data and configuration information. Frame
-	 * data can be polled at any time using the Controller.getFrame() function. Call getFrame() or getFrame(0) to get the
-	 * most recent frame.Set the history parameter to a positive integer to access previous frames.A controller stores up
+	 * Create an instance of this Module class to access frames of tracking data and configuration information. Frame
+	 * data can be polled at any time using the LeapService.getFrame() function. Call getFrame() or getFrame(0) to get the
+	 * most recent frame. Set the history parameter to a positive integer to access previous frames. A controller stores up
 	 * to 60 frames in its frame history.
 	 *
 	 * Polling is an appropriate strategy for applications which already have an intrinsic update loop, such as a game.
 	 * You can also subscribe to the onFrame event to get tracking frames through an event delegate.
 	 *
-	 * If the current thread implements a SynchronizationContext that contains a message loop, events are posted to that
-	 * threads message loop. Otherwise, events are called on an independent thread and applications must perform any
-	 * needed synchronization or marshalling of data between threads. Note that Unity3D does not create an appropriate
-	 * SynchronizationContext object. Typically, event handlers cannot access any Unity objects.
+	 * Note that any physical quantities and directions obtained from the Leap tracking data are relative to the Leap
+	 * Motion coordinate system, which uses a right-handed axes and units of millimeters.
 	 */
 	class LeapService : public Module<LeapService>
 	{
@@ -49,7 +47,7 @@ namespace bs
 		/** Destroys a previously opened connection. */
 		void destroyConnection();
 
-		/** The map of currently attached and recognized Leap Motion controller devices. */
+		/** The map of currently attached and recognized Leap Motion devices. */
 		const Map<LeapDeviceHandle, SPtr<LeapDevice>>& getDevices() const { return mDevices; }
 
 		/** The device that is currently streaming tracking data. */
@@ -58,15 +56,15 @@ namespace bs
 		/** Returns the device with provided handle. */
 		SPtr<LeapDevice> getDeviceByHandle(LeapDeviceHandle handle) const;
 
-		int64_t getNow();
+		/** Samples the universal clock used by the system to timestamp image and tracking frames. */
+		INT64 getNow();
 
 		/** Returns if the service has a frame. Use the optional history parameter to specify which frame to retrieve. */
-		bool hasFrame(uint32_t history = 0);
+		bool hasFrame(UINT32 history = 0);
 
 		/**
-		 * In most cases you should get Frame objects using the CLeapServiceProvider. The data in LeapFrame objects taken
-		 * directly from LeapService instance is still in the Leap Motion frame of reference and will not match the hands
-		 * displayed in a Unity scene.
+		 * In most cases you should get LeapFrame objects using the CLeapServiceProvider. The data in LeapFrame objects
+		 * taken directly from LeapService instance is still in the Leap Motion frame of reference.
 		 *
 		 * Returns a frame of tracking data from the Leap Motion software. Use the optional history parameter to specify
 		 * which frame to retrieve. Call getFrame() or getFrame(0) to access the most recent frame; call getFrame(1) to
@@ -78,14 +76,14 @@ namespace bs
 		 * @returns The specified frame; or, if no history parameter is specified, the newest frame. If a frame is not
 		 * available at the specified history position, an invalid Frame is returned.
 		 */
-		const LeapFrame& getFrame(uint32_t history = 0);
+		const LeapFrame& getFrame(UINT32 history = 0);
 
 		/**
 		 * Returns the timestamp of a recent tracking frame.  Use the optional history parameter to specify how many frames
 		 * in the past to retrieve the timestamp.  Leave the history parameter as it's default value to return the timestamp
 		 * of the most recent frame.
 		 */
-		int64_t getFrameTimestamp(uint32_t history = 0);
+		INT64 getFrameTimestamp(UINT32 history = 0);
 
 		/**
 		 * Retrieves the number of bytes required to allocate an interpolated frame at the specified time.
@@ -93,12 +91,12 @@ namespace bs
 		 * @param[out] size Receives the number of bytes required to store the specified frame.
 		 * @returns true if frame interompoation is possible, false otherwise.
 		 */
-		bool getInterpolatedFrameSize(int64_t timestamp, uint64_t& size);
+		bool getInterpolatedFrameSize(INT64 timestamp, UINT64& size);
 
 		/** Returns the frame at the specified time, interpolating the data between existing frames, if necessary. */
-		bool getInterpolatedFrame(int64_t timestamp, LeapFrameAlloc* toFill);
+		bool getInterpolatedFrame(INT64 timestamp, LeapFrameAlloc* toFill);
 
-		bool getInterpolatedFrameFromTime(int64_t time, int64_t sourceTime, LeapFrameAlloc* toFill);
+		bool getInterpolatedFrameFromTime(INT64 time, INT64 sourceTime, LeapFrameAlloc* toFill);
 
 		void setPolicy(eLeapPolicyFlag policy);
 		void clearPolicy(eLeapPolicyFlag policy);
@@ -122,11 +120,11 @@ namespace bs
 		typedef void(*PfnOnConnectionLost)(const LEAP_CONNECTION_LOST_EVENT *connectionLostEvent);
 		typedef void(*PfnOnDevice)(const LEAP_DEVICE_EVENT *deviceEvent);
 		typedef void(*PfnOnDeviceFailure)(const LEAP_DEVICE_FAILURE_EVENT *deviceFailureEvent);
-		typedef void(*PfnOnPolicy)(const uint32_t currentPolicies);
+		typedef void(*PfnOnPolicy)(const UINT32 currentPolicies);
 		typedef void(*PfnOnTracking)(const LeapFrame *trackingEvent);
-		typedef void(*PfnOnLog)(const eLeapLogSeverity severity, const int64_t timestamp, const char *message);
-		typedef void(*PfnOnConfigChange)(const uint32_t requestID, const bool success);
-		typedef void(*PfnOnConfigResponse)(const uint32_t requestID, LEAP_VARIANT value);
+		typedef void(*PfnOnLog)(const eLeapLogSeverity severity, const INT64 timestamp, const char *message);
+		typedef void(*PfnOnConfigChange)(const UINT32 requestID, const bool success);
+		typedef void(*PfnOnConfigResponse)(const UINT32 requestID, LEAP_VARIANT value);
 		typedef void(*PfnOnImage)(const LEAP_IMAGE_EVENT *imageEvent);
 		typedef void(*PfnOnPointMappingChange)(const LEAP_POINT_MAPPING_CHANGE_EVENT *pointMappingChangeEvent);
 		typedef void(*PfnOnHeadPose)(const LEAP_HEAD_POSE_EVENT *headPoseEvent);
@@ -136,11 +134,11 @@ namespace bs
 		Event<void(const LEAP_DEVICE_EVENT *deviceEvent)> onDevice;
 		Event<void(const LEAP_DEVICE_EVENT *deviceEvent)> onDeviceLost;
 		Event<void(const LEAP_DEVICE_FAILURE_EVENT *deviceFailureEvent)> onDeviceFailure;
-		Event<void(const uint32_t currentPolicies)> onPolicy;
+		Event<void(const UINT32 currentPolicies)> onPolicy;
 		Event<void(const LeapFrame *trackingEvent)> onFrame;
-		Event<void(const eLeapLogSeverity severity, const int64_t timestamp, const char *message)> onLogMessage;
-		Event<void(const uint32_t requestID, const bool success)> onConfigChange;
-		Event<void(const uint32_t requestID, LEAP_VARIANT value)> onConfigResponse;
+		Event<void(const eLeapLogSeverity severity, const INT64 timestamp, const char *message)> onLogMessage;
+		Event<void(const UINT32 requestID, const bool success)> onConfigChange;
+		Event<void(const UINT32 requestID, LEAP_VARIANT value)> onConfigResponse;
 		Event<void(const LEAP_IMAGE_EVENT *imageEvent)> onImage;
 		Event<void(const LEAP_POINT_MAPPING_CHANGE_EVENT *pointMappingChangeEvent)> onPointMappingChange;
 		Event<void(const LEAP_HEAD_POSE_EVENT *headPoseEvent)> onHeadPose;
@@ -152,7 +150,6 @@ namespace bs
 		*/
 		void processMessageLoop();
 
-		/** For internal use only. */
 		SPtr<LeapDevice> findDeviceByHandle(LeapDeviceHandle handle) const;
 
 		/** Caches the newest frame by copying the tracking event struct returned by LeapC. */
@@ -196,7 +193,7 @@ namespace bs
 		Thread* mThread;
 		volatile bool mIsRunning = false;
 
-		static constexpr int32_t _frameBufferLength = 60;
+		static constexpr INT32 _frameBufferLength = 60;
 
 		CircularBuffer<LeapFrame> mFrames;
 

@@ -8,17 +8,11 @@ namespace bs
 {
 	CLeapFingerModel::CLeapFingerModel()
 	{
-		setName("LeapFingerModel");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	CLeapFingerModel::CLeapFingerModel(const HSceneObject& parent)
 		: Component(parent)
 	{
-		setName("LeapFingerModel");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	void CLeapFingerModel::setLeapHand(const LeapHand* hand)
@@ -29,9 +23,9 @@ namespace bs
 			mFinger = &mHand->mDigits[(int)mType];
 	}
 
-	void CLeapFingerModel::initFinger()
+	void CLeapFingerModel::onInitModel()
 	{
-		updateFinger();
+		updateFrame();
 	}
 
 	Vector3 CLeapFingerModel::getTipPosition()
@@ -122,6 +116,13 @@ namespace bs
 	{
 		const LeapBone& bone = mFinger->mBones[bone_type];
 		return (bone.mNextJoint - bone.mPrevJoint).length();
+	}
+
+	/** Returns the width of the finger bone.*/
+
+	inline float CLeapFingerModel::getBoneWidth(int bone_type)
+	{
+		return mFinger->mBones[bone_type].mWidth;
 	}
 
 	float CLeapFingerModel::getFingerJointStretchMecanim(int joint_type)

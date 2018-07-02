@@ -119,9 +119,9 @@ namespace bs
 		void _transformFrame(const LeapFrameAlloc& source, LeapFrameAlloc& dest);
 
 	private:
-		void onDeviceInit(const LEAP_DEVICE_EVENT *device_event);
+		void onDeviceInit(const LEAP_DEVICE_EVENT *deviceEvent);
 
-		void triggerOnDeviceSafe(const LEAP_DEVICE_EVENT *device_event);
+		void triggerOnDeviceSafe(const LEAP_DEVICE_EVENT *deviceEvent);
 
 	protected:
 		/** The maximum number of times the provider will attempt to reconnect to the service. */

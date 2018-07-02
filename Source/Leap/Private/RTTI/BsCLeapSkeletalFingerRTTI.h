@@ -39,7 +39,8 @@ namespace bs
 
 		SPtr<IReflectable> newRTTIObject() override
 		{
-			return GameObjectRTTI::createGameObject<CLeapSkeletalFinger>();
+			BS_EXCEPT(InternalErrorException, "Cannot instantiate an abstract class.");
+			return nullptr;
 		}
 	};
 

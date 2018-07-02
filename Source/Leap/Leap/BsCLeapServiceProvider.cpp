@@ -66,6 +66,7 @@ namespace bs
 		default:
 			LOGERR("Unexpected physics extrapolation mode: " + mPhysicsExtrapolation);
 		}
+		return 0;
 	}
 
 	void CLeapServiceProvider::retransformFrames()

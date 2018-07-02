@@ -20,17 +20,13 @@ namespace bs
 		setName("LeapCapsuleHand");
 	}
 
-	/** @copydoc CLeapHandModelBase::init */
-
-	void CLeapCapsuleHand::initHand()
+	void CLeapCapsuleHand::onInitModel()
 	{
 		if (mMaterial != NULL)
 		{
 			//mSphereMaterial = new Material(mMaterial);
 		}
 	}
-
-	/** @copydoc CLeapHandModelBase::begin */
 
 	void CLeapCapsuleHand::begin()
 	{
@@ -48,9 +44,7 @@ namespace bs
 		//}
 	}
 
-	/** @copydoc CLeapHandModelBase::updateHand */
-
-	void CLeapCapsuleHand::updateHand()
+	void CLeapCapsuleHand::updateFrame()
 	{
 		if (mSpherePositions.size() != TOTAL_JOINT_COUNT)
 			mSpherePositions.resize(TOTAL_JOINT_COUNT);

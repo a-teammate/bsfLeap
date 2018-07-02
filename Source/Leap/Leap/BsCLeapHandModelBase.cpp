@@ -30,10 +30,6 @@ namespace bs
 		mIsTracked = false;
 	}
 
-	/************************************************************************/
-	/* 								SERIALIZATION                      		*/
-	/************************************************************************/
-
 	RTTITypeBase* CLeapHandModelBase::getRTTIStatic()
 	{
 		return CLeapHandModelBaseRTTI::instance();

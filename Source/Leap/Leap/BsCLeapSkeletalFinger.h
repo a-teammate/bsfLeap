@@ -20,20 +20,14 @@ namespace bs
 	public:
 		CLeapSkeletalFinger(const HSceneObject& parent);
 
-		/** Initializes the finger bones and joints by setting their positions and rotations. */
-		void initFinger() override;
+		/** @copydoc CLeapFingerModel::onInitModel */
+		void onInitModel() override;
 
-		/** Updates the finger bones and joints by setting their positions and rotations. */
-		void updateFinger() override;
+		/** @copydoc CLeapFingerModel::updateFrame */
+		void updateFrame() override;
 
 	protected:
 		void setPositions();
-
-		/************************************************************************/
-		/* 						COMPONENT OVERRIDES                      		*/
-		/************************************************************************/
-	protected:
-		friend class SceneObject;
 
 		/************************************************************************/
 		/* 								RTTI		                     		*/

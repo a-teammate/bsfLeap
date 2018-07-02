@@ -19,12 +19,12 @@ namespace bs
 		setName("LeapRigidHand");
 	}
 
-	void CLeapRigidHand::updateHand()
+	void CLeapRigidHand::updateFrame()
 	{
 		for (int f = 0; f < NUM_FINGERS; ++f)
 		{
 			if (mFingers[f] != NULL)
-				mFingers[f]->updateFinger();
+				mFingers[f]->updateFrame();
 		}
 
 		if (mPalm != NULL)

@@ -34,14 +34,14 @@ namespace bs
 		/** @copydoc CLeapHandModelBase::setLeapHand */
 		void setLeapHand(const LeapHand* hand) override { mHand = hand; }
 
-		/** @copydoc CLeapHandModelBase::init */
-		void initHand() override;
+		/** @copydoc CLeapHandModelBase::onInitModel */
+		void onInitModel() override;
 
 		/** @copydoc CLeapHandModelBase::begin */
 		void begin() override;
 
-		/** @copydoc CLeapHandModelBase::updateHand */
-		void updateHand() override;
+		/** @copydoc CLeapHandModelBase::updateFrame */
+		void updateFrame() override;
 
 	private:
 		void onValidate();

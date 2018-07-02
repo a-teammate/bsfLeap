@@ -57,7 +57,7 @@ namespace bs
 	UINT32 windowResWidth = 1280;
 	UINT32 windowResHeight = 720;
 
-	Vector3 leapProviderPos(0.0f, 0.0f, 1.0f);
+	Vector3 leapProviderPos(0.0f, -1.0f, 1.0f);
 	Vector3 leapProviderScl(0.01f, 0.01f, 0.01f);
 
 	struct HandAssets
@@ -182,9 +182,9 @@ namespace bs
 				//collider->setHalfHeight(0.15f);
 				//collider->setCenter(Vector3(0.15f, 0.0f, 0.0f));
 
-				HRigidbody capsuleRigidbody = boneSO->addComponent<CRigidbody>();
-				capsuleRigidbody->setIsKinematic(true);
-				capsuleRigidbody->setMass(1e9f);
+				HRigidbody rigidbody = boneSO->addComponent<CRigidbody>();
+				rigidbody->setIsKinematic(true);
+				rigidbody->setMass(1e9f);
 
 				boneSO->setParent(fingerSO);
 			}

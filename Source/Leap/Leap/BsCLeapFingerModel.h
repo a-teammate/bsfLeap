@@ -12,80 +12,68 @@ namespace bs
 	*  @{
 	*/
 
-	/**
-	 * The base class for all fingers.
-	 *
-	 * This class serves as the interface between the LeapServiceProvider, the parent LeapHand and the finger objects.
-	 *
-	 * Subclasses of CLeapFingerModel must implement init() and update(). The InitHand() function is typically called by
-	 * the parent HandModel InitHand() method; likewise, the UpdateFinger() function is typically called by the parent
-	 * HandModel UpdateHand() function.
-	 */
+	/** The base component class for all finger models. */
 	class CLeapFingerModel : public Component
 	{
 	public:
 		CLeapFingerModel(const HSceneObject& parent);
 
-		/** Returns the LeapHand object. */
+		/** Returns the latest Leap hand data represented by this model. */
 		const LeapHand* getLeapHand() const { return mHand; }
 
-		/** Returns the LeapFinger object. */
+		/** Returns the latest Leap hand finger represented y this model. */
 		const LeapFinger* getLeapFinger() const { return mFinger; }
 
-		/** Sets the Leap Hand and Leap Finger for this finger. */
+		/** Sets the Leap hand and finger data for this finger. */
 		void setLeapHand(const LeapHand* hand);
 
 		/**
 		* Implement this function to initialize this finger after it is created.
-		* Typically, this function is called by the parent LeapHandModel object.
+		* Typically, this function is called by the parent CLeapHandModel component.
 		*/
-		virtual void initFinger();
+		virtual void onInitModel();
 
 		/**
-		* Implement this function to update this finger.
-		* Typically, this function is called by the parent CLeapHandModel object's updateHand() function.
+		* Implement this function to update this finger once every game loop.
+		* Typically, this function is called by the parent CLeapHandModel's updateFrame() function.
 		*/
-		virtual void updateFinger() = 0;
+		virtual void updateFrame() = 0;
 
-		/** Returns the location of the tip of the finger */
+		/** Returns the location of the tip of the finger. */
 		Vector3 getTipPosition();
 
-		/** Returns the location of the given joint on the finger */
+		/** Returns the location of the given joint on the finger. */
 		Vector3 getJointPosition(int joint);
 
-		/** Returns a ray from the tip of the finger in the direction it is pointing.*/
+		/** Returns a ray from the tip of the finger in the direction it is pointing. */
 		Ray getRay();
 
-		/** Returns the center of the given bone on the finger */
-		Vector3 getBoneCenter(int bone_type);
+		/** Returns the center of the given bone on the finger. */
+		Vector3 getBoneCenter(int bone);
 
-		/** Returns the direction the given bone is facing on the finger */
-		Vector3 getBoneDirection(int bone_type);
+		/** Returns the direction the given bone is facing on the finger. */
+		Vector3 getBoneDirection(int bone);
 
-		/** Returns the rotation quaternion of the given bone */
-		Quaternion getBoneRotation(int bone_type);
+		/** Returns the rotation quaternion of the given bone. */
+		Quaternion getBoneRotation(int bone);
 
-		/** Returns the length of the finger bone.*/
-		float getBoneLength(int bone_type);
+		/** Returns the length of the finger bone. */
+		float getBoneLength(int bone);
 
-		/** Returns the width of the finger bone.*/
-		float getBoneWidth(int bone_type)
-		{
-			return mFinger->mBones[bone_type].mWidth;
-		}
+		/** Returns the width of the finger bone. */
+		float getBoneWidth(int bone);
 
 		/**
-		* Returns Mecanim stretch angle in the range (-180, +180]
-		* NOTE: Positive stretch opens the hand.
-		* For the thumb this moves it away from the palm.
-		*/
-		float getFingerJointStretchMecanim(int joint_type);
+		 * Returns Mecanim stretch angle in the range (-180, +180]
+		 * Positive stretch opens the hand. For the thumb this moves it away from the palm.
+		 */
+		float getFingerJointStretchMecanim(int joint);
 
 		/**
-		* Returns Mecanim spread angle, which only applies to joint_type = 0
-		* Positive spread is towards thumb for index and middle, but is in the opposite direction for the ring and pinky.
-		* For the thumb negative spread rotates the thumb in to the palm.
-		* */
+		 * Returns Mecanim spread angle, which only applies to joint_type = 0
+		 * Positive spread is towards thumb for index and middle, but is in the opposite direction for the ring and pinky.
+		 * For the thumb negative spread rotates the thumb in to the palm.
+		 */
 		float getFingerJointSpreadMecanim();
 
 	public:
@@ -97,17 +85,17 @@ namespace bs
 
 		LeapFinger::Type mType = LeapFinger::TYPE_INDEX;
 
-		/** Bones positioned and rotated by FingerModel. */
+		/** Bone SceneObjects positioned and rotated by this model. */
 		HSceneObject mBones[NUM_BONES];
 
-		/** Joints positioned and rotated by FingerModel. */
+		/** Joint SceneObjects positioned and rotated by this model. */
 		HSceneObject mJoints[NUM_BONES - 1];
 
 	protected:
-		/** LeapHand object. */
+		/** Latest Leap hand data. */
 		const LeapHand* mHand;
 
-		/** LeapFinger object. */
+		/** Latest Leap finger data. */
 		const LeapFinger* mFinger;
 
 		/************************************************************************/

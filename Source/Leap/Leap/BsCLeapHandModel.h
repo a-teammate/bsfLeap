@@ -70,7 +70,8 @@ namespace bs
 
 		void setLeapHand(const LeapHand* hand) override;
 
-		void initHand() override;
+		/** @copydoc CLeapHandModelBase::onInitModel */
+		void onInitModel() override;
 
 		/**
 		* Returns the ID associated with the hand in the Leap API. This ID is guaranteed to be unique among all hands

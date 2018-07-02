@@ -146,19 +146,19 @@ namespace bs
 		return findDeviceByHandle(handle);
 	}
 
-	int64_t LeapService::getNow()
+	INT64 LeapService::getNow()
 	{
 		return LeapGetNow();
 	}
 
-	bool LeapService::hasFrame(uint32_t history)
+	bool LeapService::hasFrame(UINT32 history)
 	{
 		Lock lock(mMutex);
 
 		return history < mFrames.size();
 	}
 
-	const LeapFrame& LeapService::getFrame(uint32_t history)
+	const LeapFrame& LeapService::getFrame(UINT32 history)
 	{
 		Lock lock(mMutex);
 
@@ -166,7 +166,7 @@ namespace bs
 		return frame;
 	}
 
-	int64_t LeapService::getFrameTimestamp(uint32_t history)
+	INT64 LeapService::getFrameTimestamp(UINT32 history)
 	{
 		Lock lock(mMutex);
 
@@ -174,7 +174,7 @@ namespace bs
 		return frame.mInfo.timestamp;
 	}
 
-	bool LeapService::getInterpolatedFrameSize(int64_t timestamp, uint64_t& size)
+	bool LeapService::getInterpolatedFrameSize(INT64 timestamp, UINT64& size)
 	{
 		eLeapRS result = LeapGetFrameSize(mConnection, timestamp, &size);
 
@@ -187,9 +187,9 @@ namespace bs
 		return true;
 	}
 
-	bool LeapService::getInterpolatedFrame(int64_t time, LeapFrameAlloc* toFill)
+	bool LeapService::getInterpolatedFrame(INT64 time, LeapFrameAlloc* toFill)
 	{
-		uint64_t size;
+		UINT64 size;
 		bool success = getInterpolatedFrameSize(time, size);
 		if (!success)
 			return false;
@@ -207,9 +207,9 @@ namespace bs
 		return true;
 	}
 
-	bool LeapService::getInterpolatedFrameFromTime(int64_t time, int64_t sourceTime, LeapFrameAlloc* toFill)
+	bool LeapService::getInterpolatedFrameFromTime(INT64 time, INT64 sourceTime, LeapFrameAlloc* toFill)
 	{
-		uint64_t size;
+		UINT64 size;
 		bool success = getInterpolatedFrameSize(time, size);
 		if (!success)
 			return false;
@@ -229,10 +229,10 @@ namespace bs
 
 	void LeapService::setPolicy(eLeapPolicyFlag policy)
 	{
-		uint64_t setFlags = (uint64_t)policy;
+		UINT64 setFlags = (UINT64)policy;
 		mRequestedPolicies = mRequestedPolicies | setFlags;
 		setFlags = mRequestedPolicies;
-		uint64_t clearFlags = ~mRequestedPolicies; // inverse of desired policies
+		UINT64 clearFlags = ~mRequestedPolicies; // inverse of desired policies
 
 		eLeapRS result = LeapSetPolicyFlags(mConnection, setFlags, clearFlags);
 		if (result != eLeapRS_Success)
@@ -241,7 +241,7 @@ namespace bs
 
 	void LeapService::clearPolicy(eLeapPolicyFlag policy)
 	{
-		uint64_t clearFlags = (uint64_t)policy;
+		UINT64 clearFlags = (UINT64)policy;
 		mRequestedPolicies = mRequestedPolicies & ~clearFlags;
 
 		eLeapRS result = LeapSetPolicyFlags(mConnection, mRequestedPolicies, ~mRequestedPolicies);
@@ -292,7 +292,7 @@ namespace bs
 		LEAP_CONNECTION_MESSAGE msg;
 		while (mIsRunning)
 		{
-			unsigned int timeout = 1000;
+			UINT32 timeout = 1000;
 			result = LeapPollConnection(mConnection, timeout, &msg);
 
 			if (result != eLeapRS_Success)
@@ -388,7 +388,7 @@ namespace bs
 		deviceInfo.serial_length = 0;
 		deviceInfo.serial = NULL;
 		result = LeapGetDeviceInfo(deviceHandle, &deviceInfo);
-		deviceInfo.serial = (char *)malloc(deviceInfo.serial_length);
+		deviceInfo.serial = (char*)malloc(deviceInfo.serial_length);
 		result = LeapGetDeviceInfo(deviceHandle, &deviceInfo);
 		if (result != eLeapRS_Success)
 		{
@@ -502,10 +502,10 @@ namespace bs
 			onConfigResponse(configResponseEvent->requestID, configResponseEvent->value);
 	}
 
-	void LeapService::handleOnImage(const LEAP_IMAGE_EVENT* image_event)
+	void LeapService::handleOnImage(const LEAP_IMAGE_EVENT* imageEvent)
 	{
 		if (!onImage.empty())
-			onImage(image_event);
+			onImage(imageEvent);
 	}
 
 	void LeapService::handleOnPointMappingChange(const LEAP_POINT_MAPPING_CHANGE_EVENT* pointMappingChangeEvent)

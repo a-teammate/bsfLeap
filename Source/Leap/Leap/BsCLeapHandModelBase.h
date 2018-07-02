@@ -20,9 +20,7 @@ namespace bs
 		Physics,
 	};
 
-	/**
-	 * Abstract base class for building Leap hand models.
-	 */
+	/** The base component class for all hand models. */
 	class CLeapHandModelBase : public Component
 	{
 	public:
@@ -38,34 +36,28 @@ namespace bs
 
 		/**
 		 * Implement this function to initialise this hand after it is created.
-		 * This function is called by the HandModelManager during the Update()
-		 * phase when a new hand is detected by the Leap Motion device.
+		 * This function is called by the HandModelManager during the update() phase when a new hand is detected by the
+		 * Leap Motion device.
 		 */
-		virtual void initHand() {}
+		virtual void onInitModel() {}
 
 		virtual void begin();
 
 		/**
 		 * Implement this function to update this hand once every game loop.
-		 * For HandModel instances assigned to the HandController graphics hand list,
-		 * the HandController calls this function during the Update() phase. For
-		 * HandModel instances in the physics hand list, the HandModelManager calls
-		 * this function in the FixedUpdate() phase.
+		 * For CLeapHandModel instances assigned to the CLeapHandModelManager graphics hand list, the CLeapHandModelManager
+		 * calls this function during the update() phase. For CLeapHandModel instances in the physics hand list, the
+		 * CLeapHandModelManager calls this function in the fixedUpdate() phase.
 		 */
-		virtual void updateHand() = 0;
+		virtual void updateFrame() = 0;
 
 		virtual void finishHand();
 
-		/**
-		 * Returns the Leap Hand object represented by this HandModel.
-		 * Note that any physical quantities and directions obtained from the
-		 * Leap Hand object are relative to the Leap Motion coordinate system,
-		 * which uses a right-handed axes and units of millimeters.
-		 */
+		/** Returns the Leap hand object represented by this hand model. */
 		virtual const LeapHand* getLeapHand() const = 0;
 
 		/**
-		 * Assigns a Leap Hand object to this hand model.
+		 * Assigns a Leap hand object to this hand model.
 		 * Note that the Leap Hand objects are recreated every frame. The parent
 		 * HandController calls this method to set or update the underlying hand.
 		 */

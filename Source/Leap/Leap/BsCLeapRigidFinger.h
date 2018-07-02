@@ -16,7 +16,7 @@ namespace bs
 	public:
 		CLeapRigidFinger(const HSceneObject &parent);
 
-		void updateFinger() override;
+		void updateFrame() override;
 
 		float filtering = 0.5f;
 

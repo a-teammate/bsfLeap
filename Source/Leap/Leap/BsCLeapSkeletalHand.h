@@ -20,18 +20,17 @@ namespace bs
 	public:
 		CLeapSkeletalHand(const HSceneObject& parent);
 
-	protected:
-		const float PALM_CENTER_OFFSET = 0.015f;
-
-
 	public:
-		/** Updates the hand and its component parts by setting their positions and rotations. */
-		void updateHand() override;
+		/** @copydoc CLeapHandModelBase::updateFrame */
+		void updateFrame() override;
 
 	protected:
 		Vector3 getPalmCenter();
 
 		void setPositions();
+
+	protected:
+		const float PALM_CENTER_OFFSET = 0.015f;
 
 		/************************************************************************/
 		/* 						COMPONENT OVERRIDES                      		*/

@@ -8,25 +8,19 @@ namespace bs
 {
 	CLeapSkeletalFinger::CLeapSkeletalFinger()
 	{
-		setName("LeapSkeletalFinger");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	CLeapSkeletalFinger::CLeapSkeletalFinger(const HSceneObject& parent)
 		: CLeapFingerModel(parent)
 	{
-		setName("LeapSkeletalFinger");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
-	void CLeapSkeletalFinger::initFinger()
+	void CLeapSkeletalFinger::onInitModel()
 	{
 		setPositions();
 	}
 
-	void CLeapSkeletalFinger::updateFinger()
+	void CLeapSkeletalFinger::updateFrame()
 	{
 		setPositions();
 	}

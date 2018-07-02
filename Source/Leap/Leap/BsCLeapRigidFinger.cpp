@@ -28,7 +28,7 @@ namespace bs
 		}
 	}
 
-	void CLeapRigidFinger::updateFinger()
+	void CLeapRigidFinger::updateFrame()
 	{
 		for (int i = 0; i < NUM_BONES; ++i)
 		{
@@ -56,7 +56,7 @@ namespace bs
 				//else
 				{
 					//mBones[i]->setWorldPosition(getBoneCenter(i));
-					mBones[i]->setWorldPosition(mFinger->mBones[mType].mNextJoint);
+					mBones[i]->setWorldPosition(mFinger->mBones[i].mNextJoint);
 					//mBones[i]->setRotation(getBoneRotation(i));
 				}
 			}

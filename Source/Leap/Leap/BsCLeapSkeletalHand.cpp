@@ -8,17 +8,11 @@ namespace bs
 {
 	CLeapSkeletalHand::CLeapSkeletalHand()
 	{
-		setName("LeapSkeletalHand");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	CLeapSkeletalHand::CLeapSkeletalHand(const HSceneObject& parent)
 		: CLeapHandModel(parent)
 	{
-		setName("LeapSkeletalHand");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	void CLeapSkeletalHand::start()
@@ -30,7 +24,7 @@ namespace bs
 		}
 	}
 
-	void CLeapSkeletalHand::updateHand()
+	void CLeapSkeletalHand::updateFrame()
 	{
 		setPositions();
 	}

@@ -8,17 +8,11 @@ namespace bs
 {
 	CLeapHandModel::CLeapHandModel()
 	{
-		setName("LeapHandModel");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	CLeapHandModel::CLeapHandModel(const HSceneObject& parent)
 		: CLeapHandModelBase(parent)
 	{
-		setName("LeapHandModel");
-
-		mNotifyFlags = (TransformChangedFlags)(TCF_Parent | TCF_Transform);
 	}
 
 	Quaternion CLeapHandModel::getPalmRotation()
@@ -136,13 +130,13 @@ namespace bs
 		}
 	}
 
-	void CLeapHandModel::initHand()
+	void CLeapHandModel::onInitModel()
 	{
 		for (int f = 0; f < NUM_FINGERS; ++f)
 		{
 			if (mFingers[f] != NULL) {
 				mFingers[f]->mType = (LeapFinger::Type)f;
-				mFingers[f]->initFinger();
+				mFingers[f]->onInitModel();
 			}
 		}
 	}

@@ -33,9 +33,9 @@ namespace bs
 		if (model->getLeapHand() == NULL)
 		{
 			model->setLeapHand(mLeapHand);
-			model->initHand();
+			model->onInitModel();
 			model->begin();
-			model->updateHand();
+			model->updateFrame();
 		}
 		else
 		{
@@ -57,7 +57,7 @@ namespace bs
 		for (int i = 0; i < mHandModels.size(); i++)
 		{
 			mHandModels[i]->setLeapHand(leapHand);
-			mHandModels[i]->updateHand();
+			mHandModels[i]->updateFrame();
 		}
 	}
 }
