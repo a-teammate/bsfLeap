@@ -93,6 +93,9 @@ target_link_libraries(bsfLeap bsf)
 ## External lib: Leap
 target_link_libraries(bsfLeap ${Leap_LIBRARIES})
 
+# IDE specific
+set_property(TARGET bsfLeap PROPERTY FOLDER Plugins)
+
 # Copy bsf binaries
 copyBsfBinaries(bsfLeap ${BSF_DIRECTORY})
 

@@ -12,29 +12,11 @@ include(${BSF_SOURCE_DIR}/CMake/Properties.cmake)
 include(${BSF_SOURCE_DIR}/CMake/FindPackageOrBuild.cmake)
 include(${BSF_SOURCE_DIR}/CMake/HelperMethods.cmake)
 
-set (BSF_LEAP_SOURCE_DIR ${PROJECT_SOURCE_DIR}/Source)
-
-include(${BSF_LEAP_SOURCE_DIR}/CMake/Properties.cmake)
-
 add_subdirectory(${BSF_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/bsf)
 
-set(BS_EXAMPLES_BUILTIN_ASSETS_VERSION 7)
+set(BSF_LEAP_DIRECTORY "${PROJECT_SOURCE_DIR}" CACHE STRING "bsfLeap directory")
 
-# Options
-set(BUILD_LEAP_EXAMPLES OFF CACHE BOOL "If true, build targets for running examples will be included in the output.")
-
-# Generate config file
-configure_file("${PROJECT_SOURCE_DIR}/Source/CMake/BsExampleConfig.h.in" "${PROJECT_SOURCE_DIR}/Source/Common/BsExampleConfig.h")
-
-if(BUILD_LEAP_EXAMPLES)
-	# Check data dependencies
-	check_and_update_builtin_assets(bsfExamples ${PROJECT_SOURCE_DIR}/Data ${BS_EXAMPLES_BUILTIN_ASSETS_VERSION} NO)
-endif()
+set(BSF_LEAP_SOURCE_DIR ${BSF_LEAP_DIRECTORY}/Source)
 
 # Sub-directories
-add_subdirectory(Source/Leap)
-
-if(BUILD_LEAP_EXAMPLES)
-	add_subdirectory(Source/Common)
-	add_subdirectory(Source/Physics)
-endif()
+add_subdirectory(Source)

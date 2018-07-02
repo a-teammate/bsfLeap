@@ -2,20 +2,20 @@
 include(CMakeSources.cmake)
 
 # Target
-add_library(Common STATIC ${BS_COMMON_SRC})
+add_library(bsfLeapCommon STATIC ${BSF_LEAP_COMMON_SRC})
 
 # Includes
-target_include_directories(Common PUBLIC "./")
-	
+target_include_directories(bsfLeapCommon PUBLIC "./")
+
 # Libraries
 ## Local libs
-target_link_libraries(Common bsf)
+target_link_libraries(bsfLeapCommon bsf)
 
 # IDE specific
-set_property(TARGET Common PROPERTY FOLDER Examples)
+set_property(TARGET bsfLeapCommon PROPERTY FOLDER Examples)
 
 # Copy bsf binaries
-copyBsfBinaries(Common ${BSF_DIRECTORY})
+copyBsfBinaries(bsfLeapCommon ${BSF_DIRECTORY})
 
 # Precompiled header & Unity build
-conditional_cotire(Common)
+conditional_cotire(bsfLeapCommon)

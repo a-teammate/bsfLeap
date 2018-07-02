@@ -1,4 +1,4 @@
-set(BS_COMMON_INC_NOFILTER
+set(BSF_LEAP_COMMON_INC_NOFILTER
 	"BsExampleFramework.h"
 	"BsCameraFlyer.h"
 	"BsObjectRotator.h"
@@ -6,14 +6,14 @@ set(BS_COMMON_INC_NOFILTER
 	"BsFPSCamera.h"
 )
 
-set(BS_COMMON_SRC_NOFILTER
+set(BSF_LEAP_COMMON_SRC_NOFILTER
 	"BsCameraFlyer.cpp"
 	"BsObjectRotator.cpp"
 	"BsFPSWalker.cpp"
 	"BsFPSCamera.cpp"
 )
 
-set(BS_COMMON_SRC
-	${BS_COMMON_INC_NOFILTER}
-	${BS_COMMON_SRC_NOFILTER}
+set(BSF_LEAP_COMMON_SRC
+	${BSF_LEAP_COMMON_INC_NOFILTER}
+	${BSF_LEAP_COMMON_SRC_NOFILTER}
 )
