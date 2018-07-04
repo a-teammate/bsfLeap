@@ -5,6 +5,7 @@
 #include "Leap/BsLeapHandRepresentation.h"
 #include "Private/RTTI/BsCLeapHandModelManagerRTTI.h"
 #include "Scene/BsSceneManager.h"
+#include "Utility/BsUtility.h"
 
 using namespace std::placeholders;
 
@@ -296,12 +297,16 @@ namespace bs
 		if (mProvider != NULL)
 			return;
 
-		Vector<HLeapServiceProvider> providers = gSceneManager().findComponents<CLeapServiceProvider>();
+		UINT32 typeId = CLeapServiceProvider::getRTTIStatic()->getRTTIId();
+		Vector<HComponent> providers = Utility::findComponents(gSceneManager().getRootNode(), typeId);
 
 		if (providers.size() == 0)
-			LOGWRN("Could not find CLeapServiceProvider component in the scene.");
+		{
+			LOGWRN("Could not find LeapServiceProvider.");
+			return;
+		}
 
-		mProvider = providers[0];
+		mProvider = static_object_cast<CLeapServiceProvider>(providers[0]);
 	}
 
 	void CLeapHandModelManager::_initializeGroup(ModelGroup* group)
@@ -356,14 +361,13 @@ namespace bs
 		mOnUpdateFrameConn.disconnect();
 	}
 
-	void CLeapHandModelManager::onInitialized()
-	{
-		_initializeProvider();
-	}
-
-
 	void CLeapHandModelManager::onEnabled()
 	{
+		_initializeProvider();
+
+		if (mProvider == NULL)
+			return;
+
 		for (ModelGroup* group : mGroupPool)
 			_initializeGroup(group);
 

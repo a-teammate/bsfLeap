@@ -167,7 +167,7 @@ namespace bs
 
 			HLeapRigidFinger fingerModel = handSO->addComponent<CLeapRigidFinger>();
 
-			handModel->mFingers[f] = fingerModel;
+			handModel->mFingers[f] = static_object_cast<CLeapFingerModel>(fingerModel);
 
 			fingerSO->setParent(handSO);
 
@@ -483,8 +483,8 @@ namespace bs
 		HSceneObject capsuleR = handsSO->findChild("CapsuleHand_R");
 
 		handModels->addNewGroup("Capsule",
-			capsuleL->getComponent<CLeapCapsuleHand>(),
-			capsuleR->getComponent<CLeapCapsuleHand>());
+			static_object_cast<CLeapHandModelBase>(capsuleL->getComponent<CLeapCapsuleHand>()),
+			static_object_cast<CLeapHandModelBase>(capsuleR->getComponent<CLeapCapsuleHand>()));
 
 		setUpRigidHand(handsSO, eLeapHandType_Left);
 		setUpRigidHand(handsSO, eLeapHandType_Right);
@@ -493,8 +493,8 @@ namespace bs
 		HSceneObject rigidR = handsSO->findChild("RigidHand_R");
 
 		handModels->addNewGroup("Rigid",
-			rigidL->getComponent<CLeapRigidHand>(),
-			rigidR->getComponent<CLeapRigidHand>());
+			static_object_cast<CLeapHandModelBase>(rigidL->getComponent<CLeapRigidHand>()),
+			static_object_cast<CLeapHandModelBase>(rigidR->getComponent<CLeapRigidHand>()));
 	}
 }
 

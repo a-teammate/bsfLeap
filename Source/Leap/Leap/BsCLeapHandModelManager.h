@@ -162,9 +162,6 @@ namespace bs
 	protected:
 		friend class SceneObject;
 
-		/** @copydoc Component::onInitialized */
-		void onInitialized() override;
-
 		/** @copydoc Component::onDisabled */
 		void onDisabled() override;
 
